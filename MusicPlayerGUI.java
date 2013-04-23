@@ -19,9 +19,13 @@ import javax.swing.*;
 
 public class MusicPlayerGUI extends JFrame{
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-	private JMenuBar menuBar;
+	private JMenuBar menuBar = new JMenuBar();
+	
+	private JMenu fileMenu = new JMenu();
+	private JMenu prefsMenu = new JMenu();
+	private JMenu helpMenu = new JMenu();
 
 	private TrackGUI trackGUI;
 
@@ -39,9 +43,9 @@ public class MusicPlayerGUI extends JFrame{
 
 		setLayout(new GridBagLayout());
 
-		this.setSize(1100, 600);
+		setSize(1100, 600);
 
-		this.setResizable(false);
+		//setResizable(false);
 
 		setLocationRelativeTo(null);
 
@@ -57,66 +61,38 @@ public class MusicPlayerGUI extends JFrame{
 
 	private void mainLayout() {
 
-		int width = this.getWidth();
-		int height = this.getHeight();
-
-		System.out.println(width + ", " + height);
-
-		//setJMenuBar(menuBar);
-
-
 		trackGUI = new TrackGUI();
 
 		trackInfoBar = new TrackInfoBar();
 
 		playlistGUI = new PlaylistGUI();
 
-		JScrollPane listGUI = new JScrollPane();
-
-		//"C:\\Users\\Marcus\\Pictures\\MM\\testLabel.png"
-
 		titleLabel = new JLabel();
-		//titleLabel.setBackground(new Color(0, 60, 100));
-
 		trackInfoLabel = new JLabel();
+		
 
-		//		playlistGUI.setLocation(0, 30);
-		//		playlistGUI.setSize(new Dimension(260, 450));
-		//		
-		//		trackGUI.setLocation(265, 50);
-		//		trackGUI.setSize(new Dimension(900, 300));
-		//
-		//		trackInfoBar.setLocation(0, 500);
-		//trackInfoBar.setPreferredSize(new Dimension(1095, 200));
-
-		//titleLabel.setLocation(50, 600);
-
-		GridBagConstraints c = new GridBagConstraints();
-
-		//playlistGUI.setPreferredSize(new Dimension(250, 400));
 		playlistGUI.getViewport().setBackground(Color.white);
-		listGUI.getViewport().setBackground(Color.white);
+		playlistGUI.setBorder(null);
 
-		//trackGUI.setPreferredSize(new Dimension(800, 400));
 		trackGUI.getViewport().setBackground(Color.black);
+		trackGUI.setBorder(null);
 
-		//titleLabel.setPreferredSize(new Dimension(830, 100));
 		titleLabel.setBackground(new Color(25, 65, 123));
 		titleLabel.setOpaque(true);
 
-		//trackInfoLabel.setPreferredSize(new Dimension(250, 40));
 		trackInfoLabel.setBackground(new Color(125, 165, 13));
 		trackInfoLabel.setOpaque(true);
+		
+		GridBagConstraints c = new GridBagConstraints();
 
-		//c.fill = GridBagConstraints.BOTH;
-		//c.fill = GridBagConstraints.HORIZONTAL;
+		c.fill = GridBagConstraints.VERTICAL;
 		c.ipady = 400;
 		c.ipadx = 250;
 		c.gridheight = 2;
+		c.anchor = GridBagConstraints.LINE_START;
 		c.gridx = 0;
 		c.gridy = 0;
-		System.out.println(c.toString());
-		add(listGUI, c);
+		add(playlistGUI, c);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.ipady = 80;
@@ -140,12 +116,12 @@ public class MusicPlayerGUI extends JFrame{
 		c.gridy = 1;
 		add(trackGUI, c);
 
-		//c.fill = GridBagConstraints.VERTICAL;
 		c.ipady = 20;
 		c.ipadx = 20;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		c.gridwidth = 2;
+		c.gridwidth = 2; //TODO 
+		c.anchor = GridBagConstraints.PAGE_END;
 		c.gridheight = 1;
 		c.gridx = 0;
 		c.gridy = 2;
@@ -158,37 +134,27 @@ public class MusicPlayerGUI extends JFrame{
 		c.weighty = -1.0;
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		c.gridheight = GridBagConstraints.REMAINDER;
+		c.gridwidth = 3;
+		c.gridheight = 1;
 		c.gridx = 0;
 		c.gridy = 4;
 		add(trackInfoBar, c);
 
-		//		add(playlistGUI);
-		//		add(titleLabel);
-		//		add(trackGUI);
-		//		add(trackInfoLabel);
-		//		add(trackInfoBar);
 	}
 
 	private void menuLayout(){
 
-		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
-		JMenu fileMenu = new JMenu();
-		JMenu prefsMenu = new JMenu();
-		JMenu helpMenu = new JMenu();
-
-		JMenuItem playMenuItem;
-		JMenuItem backMenuItem;
-		JMenuItem exitMenuItem;
-		JMenuItem prefsMenuItem;
-		JMenuItem helpMenuItem;
-
-		playMenuItem 		= new JMenuItem("Play");
-		backMenuItem		= new JMenuItem("Back");
-		exitMenuItem 		= new JMenuItem("Exit");
-		prefsMenuItem 		= new JMenuItem("Preferences");
-		helpMenuItem 		= new JMenuItem("Help");
+		JMenuItem playMenuItem 		= new JMenuItem("Play");
+		JMenuItem backMenuItem		= new JMenuItem("Back");
+		JMenuItem exitMenuItem 		= new JMenuItem("Exit");
+		JMenuItem prefsMenuItem 	= new JMenuItem("Preferences");
+		JMenuItem helpMenuItem 		= new JMenuItem("Help");
+		
+		fileMenu.setText("File");
+		helpMenu.setText("Help");
+		prefsMenu.setText("Prefs");
 
 		fileMenu.add(playMenuItem);
 		fileMenu.add(backMenuItem);
@@ -209,7 +175,7 @@ public class MusicPlayerGUI extends JFrame{
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				MusicPlayerGUI main = new MusicPlayerGUI();
+				new MusicPlayerGUI();
 			}
 		});
 	}
@@ -302,5 +268,4 @@ class MenuBar extends JMenuBar {
 		add(helpMenu);
 
 	}
-
 }
