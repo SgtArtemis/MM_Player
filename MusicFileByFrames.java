@@ -1,6 +1,10 @@
+/**
+ * PROJEKT INDA 2013 
+ * Marcus Heine och Mark Hobro
+ */
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import javax.swing.*;
 
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
@@ -11,17 +15,11 @@ import javazoom.jl.decoder.SampleBuffer;
 import javazoom.jl.player.AudioDevice;
 import javazoom.jl.player.FactoryRegistry;
 
-public class MusicFileByFrames extends JFrame {
-
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	// The MPEG audio bitstream.
+public class MusicFileByFrames 
+{
+	
 	private Bitstream bitstream;
-	// The MPEG audio decoder.
 	private Decoder decoder;
-	// The AudioDevice the audio samples are written to.
 	private AudioDevice audio;
 
 	private boolean playing;
@@ -43,6 +41,11 @@ public class MusicFileByFrames extends JFrame {
 	public void play() throws JavaLayerException {
 		playFrames(0, frameCount);
 	}
+	
+	//Play a whole file from a given frame
+	public void play(int start) throws JavaLayerException {
+		playFrames(start, frameCount);
+	}
 
 	// Get the number of frames of the file
 	public int getLength() {
@@ -59,6 +62,25 @@ public class MusicFileByFrames extends JFrame {
 		pause();
 		resumePosition = position;
 	}
+	
+	public void stop(){
+		close();
+	}
+
+	private synchronized void close(){
+		 if (audio != null) {
+             AudioDevice out = audio;
+             audio = null;
+             out.close();
+             try {
+                 bitstream.close();
+             }
+             catch (BitstreamException ex) {
+             }
+             bitstream = null;
+             decoder = null;
+         }
+     }
 
 	public void pause() throws JavaLayerException {
 		synchronized (this) {
