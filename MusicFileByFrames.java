@@ -22,19 +22,19 @@ public class MusicFileByFrames
 	private Decoder decoder;
 	private AudioDevice audio;
 
-	private boolean playing;
+	private boolean playing = false;
 	private int frameCount;
 	private int frameNumber;
 	private int resumePosition;
 	private String directory;
 
 	public MusicFileByFrames(String directory) throws JavaLayerException {
+		this.directory = directory;
+		openAudio();
 		frameNumber = 0;
 		frameCount = getFrameCount(directory);
 		openBitstream(directory);
 		resumePosition = -1;
-		playing = false;
-		this.directory = directory;
 	}
 
 	// Plays the file from the first frame to the last frame (the whole file)
@@ -43,9 +43,20 @@ public class MusicFileByFrames
 	}
 	
 	//Play a whole file from a given frame
-	public void play(int start) throws JavaLayerException {
+	public void playFrom(int start) throws JavaLayerException {
 		playFrames(start, frameCount);
 	}
+	
+	public boolean play(int frames) throws JavaLayerException
+    {
+        return playFrames(frameNumber, frameNumber + frames);
+
+    }
+	
+	public boolean play(int start, int end) throws JavaLayerException
+    {
+        return playFrames(start, start + end);
+    }
 
 	// Get the number of frames of the file
 	public int getLength() {
@@ -90,7 +101,7 @@ public class MusicFileByFrames
 	}
 
 	public void resume() throws JavaLayerException {
-		if (playing != true) {
+		if (!playing) {
 			int start; // Where the track should continue playing at
 			if (resumePosition >= 0) {
 				start = resumePosition;
@@ -239,8 +250,8 @@ public class MusicFileByFrames
 
 	// Skips one frame
 	protected boolean skipFrame() throws JavaLayerException {
-		Header h = readFrame();
-		if (h == null) {
+		Header header = readFrame();
+		if (header == null) {
 			return false;
 		}
 		frameNumber++;
