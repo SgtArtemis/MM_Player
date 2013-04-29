@@ -8,21 +8,21 @@ import javazoom.jl.decoder.JavaLayerException;
 
 public class MusicPlayer 
 {
-  private MusicFileByFrames player;
+	private MusicFileByFrames framesPlayer;
 	private String directory;
 	
 	public MusicPlayer(){
-		player = null;
+		framesPlayer = null;
 		directory = "";
 	}
 	
 	//Makes the player ready to play stuff
 	private void preparePlayer(String directory){
 		try {
-            if(player != null) {
+            if(framesPlayer != null) {
                 killPlayer();
             }
-            player = new MusicFileByFrames(directory);
+            framesPlayer = new MusicFileByFrames(directory);
         }
         catch(JavaLayerException exc) {
             exc.printStackTrace();
@@ -32,27 +32,27 @@ public class MusicPlayer
 	}
 	
 	public int getLengthInFrames(){
-		if(player == null){
+		if(framesPlayer == null){
 			return 0;
 		}
 		else{
-			return player.getLength();
+			return framesPlayer.getLength();
 		}
 	}
 	
 	public void play(String directory) throws JavaLayerException{
 		preparePlayer(directory);
-		player.play();
+		playFrom(framesPlayer.getPosition());
 	}
 	
-	/*
+	
 	private void playFrom(final int start) throws JavaLayerException
     {
         Thread playerThread = new Thread() {
             public void run()
             {
                 try {
-                    player.play(start);
+                    framesPlayer.playFrom(start);
                 }
                 catch(JavaLayerException e) {
                     playerError();
@@ -62,13 +62,13 @@ public class MusicPlayer
                 }
             }
         };
+        playerThread.setPriority(Thread.MIN_PRIORITY);
         playerThread.start();
     }
-	*/
 	public void pause(){
-		if(player != null) {
+		if(framesPlayer != null) {
             try {
-                player.pause();
+                framesPlayer.pause();
             }
             catch(JavaLayerException exc){
             	exc.printStackTrace();
@@ -78,13 +78,17 @@ public class MusicPlayer
         }
 	}
 	
+	public void stop(){
+		framesPlayer.stop();
+	}
+	
 	public void resumePlaying(){
-		if(player != null) {
+		if(framesPlayer != null) {
             Thread playerThread = new Thread() {
                 public void run()
                 {
                     try {
-                        player.resume();
+                        framesPlayer.resume();
                     }
                     catch(JavaLayerException e) {
                         playerError();
@@ -94,6 +98,7 @@ public class MusicPlayer
                     }
                 }
             };
+            playerThread.setPriority(Thread.MIN_PRIORITY);
             playerThread.start();
         }
 	}
@@ -113,11 +118,10 @@ public class MusicPlayer
     }
 	
 	private synchronized void kill(){
-		 if(player != null) {
-             player.stop();
-             player = null;
+		 if(framesPlayer != null) {
+             framesPlayer.stop();
+             framesPlayer = null;
              directory = "";
          }
 	}
 }
-
