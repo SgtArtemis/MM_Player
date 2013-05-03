@@ -1,6 +1,10 @@
+package mm;
+
 /**
  * PROJEKT INDA 2013 
  * Marcus Heine och Mark Hobro
+ * 
+ * TODO - VARFÖR SKA MAN SYNKA?!?!??!!?!?!?!?!?!?!?!!!!!!!!!!!!!!!!!!!!!!????????????????????????????????????????
  */
 
 import java.io.BufferedInputStream;
@@ -17,7 +21,7 @@ import javazoom.jl.player.FactoryRegistry;
 
 public class MusicFileByFrames 
 {
-	
+
 	private Bitstream bitstream;
 	private Decoder decoder;
 	private AudioDevice audio;
@@ -41,22 +45,22 @@ public class MusicFileByFrames
 	public void play() throws JavaLayerException {
 		playFrames(0, frameCount);
 	}
-	
+
 	//Play a whole file from a given frame
 	public void playFrom(int start) throws JavaLayerException {
 		playFrames(start, frameCount);
 	}
-	
-	public boolean play(int frames) throws JavaLayerException
-    {
-        return playFrames(frameNumber, frameNumber + frames);
 
-    }
-	
+	public boolean play(int frames) throws JavaLayerException
+	{
+		return playFrames(frameNumber, frameNumber + frames);
+
+	}
+
 	public boolean play(int start, int end) throws JavaLayerException
-    {
-        return playFrames(start, start + end);
-    }
+	{
+		return playFrames(start, start + end);
+	}
 
 	// Get the number of frames of the file
 	public int getLength() {
@@ -73,31 +77,39 @@ public class MusicFileByFrames
 		pause();
 		resumePosition = position;
 	}
-	
+
 	public void stop(){
 		close();
 	}
 
 	private synchronized void close(){
-		 if (audio != null) {
-             AudioDevice out = audio;
-             audio = null;
-             out.close();
-             try {
-                 bitstream.close();
-             }
-             catch (BitstreamException ex) {
-             }
-             bitstream = null;
-             decoder = null;
-         }
-     }
+		if (audio != null) {
+			AudioDevice out = audio;
+			audio = null;
+			out.close();
+			try {
+				bitstream.close();
+			}
+			catch (BitstreamException ex) {
+			}
+			bitstream = null;
+			decoder = null;
+		}
+	}
 
 	public void pause() throws JavaLayerException {
-		synchronized (this) {
+
+		System.out.println("Attempting to pause before syncing.");
+
+		
+
+		//synchronized (this) {
 			playing = false;
-			resumePosition = frameNumber;
-		}
+			System.out.println("Attempting to pause after syncing.");
+		//}
+		
+		//resumePosition = frameNumber;
+
 	}
 
 	public void resume() throws JavaLayerException {
@@ -124,10 +136,13 @@ public class MusicFileByFrames
 
 		// Play until finished, paused, or a problem.
 		boolean ok = true;
+
+		//TODO - IMPORTANT WHILE-LOOP
 		while (frameNumber < end && playing && ok) {
 			ok = decodeFrame();
 			if (ok) {
 				frameNumber++;
+				resumePosition = frameNumber;
 			}
 		}
 
@@ -259,3 +274,4 @@ public class MusicFileByFrames
 		return true;
 	}
 }
+
