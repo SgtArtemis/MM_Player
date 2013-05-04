@@ -1,0 +1,51 @@
+  				     TODO
+
+■ Spellistor 
+
+Då vi inte har börjat med detta är detaljerna ganska oklara om alla delar som måste göras.
+
+■ Panelen med alla knappar och slidern
+
+- Fixa slidern så att den uppdateras i takt med att låten spelas.
+
+- Lägg till en typ av slider för att ändra volymen.
+
+- Fixa till knapparna så de blir snyggare! Kanske byta ut text mot ikoner och ändra 
+formerna på knapparna!
+
+■ Uppspelning
+
+- Titta mer på synkronisering osv. Behövs det verkligen? Kan vi göra programmet snabbare?
+
+- Fixa så att låtar kan spelas automatiskt när en låt är slut.
+
+- Fixa så att repeat fungerar på samma sätt, när sista låten är spelad, startas listan om 
+igen.
+
+■ Högerklickspopup
+
+- Fixa queue. Fixar vi automatisk uppspelning ska detta inte vara alltför svårt!
+
+- Behövs star-funktionen?
+
+- Fixa add to playlist, när vi väl fått playlists att fungera.
+
+■ Menubar
+
+- Preferences?
+
+- Fixa hjälpknappen!
+
+- Fixa exit-knappen.
+
+- Back? Kan tas bort?
+
+■ Övrigt
+
+- Fakereklam? :D
+
+- Visa vilken låt som spelas nere till vänster?
+
+
+
+//TODO Lägg till mer saker! LOL TODOception
