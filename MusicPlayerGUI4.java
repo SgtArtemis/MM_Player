@@ -8,6 +8,10 @@
  * Mark, du kan ju ändra så att JLists inte blir parametriserad; jag får warnings om jag inte har som det är nu.
  */
 
+//TODO
+//TODO VIKTIG JÄVLA TODO, fixa så att låtarna faktiskt automatiskt fortsätter när en låt tar slut och att repeat också fungerar för detta
+//TODO
+
 //import PopupListener;
 
 import java.awt.*;
@@ -36,7 +40,7 @@ MouseListener {
 
   private static final long serialVersionUID = 1L;
 
-  /** Define the colours */
+	/** Define the colours */
 	public static final Color TRACKLIST_GREY = new Color(55, 55, 55);
 	public static final Color LABEL_GREY = new Color(63, 63, 63);
 	public static final Color PLAYLIST_GREY = new Color(70, 70, 70);
@@ -71,9 +75,7 @@ MouseListener {
 	private JLabel trackInfoLabel;
 	private JLabel placeholder;
 
-
-
-
+	
 	public JMenuItem menuPlay = new JMenuItem("Play");
 	public JMenuItem menuQueue = new JMenuItem("Queue");
 	public JMenuItem menuList = new JMenuItem("Add to playlist");
@@ -83,6 +85,7 @@ MouseListener {
 	private JButton next = new JButton("Next");
 	private JButton previous = new JButton("Previous");
 	private JButton shuffleButton = new JButton("Shuffle");
+	private JButton repeatButton = new JButton("Repeat");
 
 	private JSlider trackTimeSlider;
 
@@ -95,6 +98,7 @@ MouseListener {
 	private ArrayList<Integer> previousTrackIndex = new ArrayList<Integer>();
 	private int TRACK_INDEX;
 	private boolean shuffle;
+	private boolean repeat;
 
 	public MusicPlayerGUI() {
 
@@ -126,7 +130,8 @@ MouseListener {
 		player = new MusicPlayer();
 		
 		shuffle = false;
-
+		
+		repeat = false;
 	}
 
 	/**
@@ -180,11 +185,13 @@ MouseListener {
 		trackInfoBar.add(next);
 		trackInfoBar.add(shuffleButton);
 		trackInfoBar.add(trackTimeSlider);
+		trackInfoBar.add(repeatButton);
 
 		playpause.addActionListener(this);
 		next.addActionListener(this);
 		previous.addActionListener(this);
 		shuffleButton.addActionListener(this);
+		repeatButton.addActionListener(this);
 
 		playing = false;
 		newTrack = true;
@@ -293,7 +300,7 @@ MouseListener {
 		placeholder.setOpaque(true);
 
 		trackInfoBar.setBackground(WINDOW_GREY);
-
+		tracklist.setCellRenderer(new MyCellRenderer());
 	}
 
 	/** Method to set all the borders */
@@ -375,8 +382,15 @@ MouseListener {
 		}
 		else if(shuffle == false){
 			setPreviousTrackIndex();
-			tracklist.setSelectedIndex(tracklist.getSelectedIndex() + 1);
-			playTrack();
+			//TODO Detta måste testas!
+			if (repeat == true && tracklist.getSelectedIndex() == tracklist.getModel().getSize()-1){
+				tracklist.setSelectedIndex(0);
+				playTrack();
+			}
+			else{
+				tracklist.setSelectedIndex(tracklist.getSelectedIndex() + 1);
+				playTrack();
+			}
 		}
 	}
 	/**
@@ -401,7 +415,6 @@ MouseListener {
 	/** Method invoked when music is to be played - TODO Städa här maybe?*/
 	private void playTrack() {
 		System.out.println("Attempting to play track: " + tracklist.getSelectedValue());
-
 		if (!trackName.equals(tracklist.getSelectedValue() + ".mp3"))
 			newTrack = true;
 
@@ -416,12 +429,12 @@ MouseListener {
 			newTrack = false;
 			playing = true;
 		}
-
+		
 	}
 
 	/** Method which basically check if you're playing or not, defining whether to play or pause.*/
 	private void pauseOrPlay() {
-
+		
 		if (!newTrack && !playing) {
 			player.resumePlaying();
 			playing = true;
@@ -432,6 +445,17 @@ MouseListener {
 			playpause.setText("Play");
 		}
 
+	}
+	
+	//TODO Vet ej hur jag ska göra detta, har inte hittat så mkt på internet
+	private void moveSlider(){
+		int frames = getFrameCount();
+		trackTimeSlider.setExtent(10);
+	}
+	
+	private int getFrameCount(){
+		int frames = player.getLengthInFrames();
+		return frames;
 	}
 
 	@Override /** Usual ActionPerformed class, this is where the stuff happens. */
@@ -478,6 +502,18 @@ MouseListener {
 				System.out.println("Shuffle is set to off.");
 			}
 		}
+		//Repeats the whole tracklist when it's done
+		if (a.getSource() == repeatButton){
+			if(repeat == false){
+				repeat = true;
+				System.out.println("Repeat is set to on.");
+			}
+			else if(repeat == true){
+				repeat = false;
+				System.out.println("Repeat is set to off.");
+			}
+		}
+		
 	}
 
 	@Override
@@ -586,7 +622,6 @@ class TrackHandler {
 
 		// TODO - This is the heart of the program - this is where the path is set.
 		File directory = new File(DIRECTORY);
-		//File directory = new File("C:\\Users\\Mark\\Songs\\");
 
 		// Create a FilenameFilter and override its accept() method
 		FilenameFilter filefilter = new FilenameFilter() {
@@ -636,3 +671,27 @@ class PopupListener extends MouseAdapter {
 
 }
 
+class MyCellRenderer extends DefaultListCellRenderer {
+
+	private static final long serialVersionUID = 1L;
+	private final Color LIGHT = new Color(47, 47, 47);
+	private final Color DARK = new Color(57, 57, 57);
+	private final Color BLUE = new Color(175, 220, 255);
+
+	public Component getListCellRendererComponent(JList list, Object value,
+			int index, boolean isSelected, boolean cellHasFocus) {
+		Component c = super.getListCellRendererComponent(list, value, index,
+				isSelected, cellHasFocus);
+
+		if (isSelected)
+			c.setBackground(BLUE);
+
+		else if (index % 2 == 0)
+			c.setBackground(LIGHT);
+
+		else
+			c.setBackground(DARK);
+
+		return c;
+	}
+}
