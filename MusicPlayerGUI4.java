@@ -20,10 +20,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Random;
+import java.io.*;
+import java.util.*;
 
 //import java.io.*;
 //import java.util.*;
@@ -35,10 +33,10 @@ import javazoom.jl.decoder.JavaLayerException;
 
 
 
-public class MusicPlayerGUI extends JFrame implements ActionListener,
+public class MusicPlayerGUI2 extends JFrame implements ActionListener,
 MouseListener {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	/** Define the colours */
 	public static final Color TRACKLIST_GREY = new Color(55, 55, 55);
@@ -49,8 +47,8 @@ MouseListener {
 	public static final Font MAIN_FONT = new Font("Tahoma", Font.PLAIN, 13);
 
 	//TODO - Här är det enda stället du behöver ändra directory.
-	//public String DIRECTORY = "C:\\Users\\Marcus\\Music\\Musik\\";
-	public String DIRECTORY = "C:\\Users\\Mark\\Songs\\";
+	public String DIRECTORY = "C:\\Users\\Marcus\\Music\\Musik\\";
+	//public String DIRECTORY = "C:\\Users\\Mark\\Songs\\";
 
 	private WindowMenuBar menuBar = new WindowMenuBar();
 
@@ -75,11 +73,11 @@ MouseListener {
 	private JLabel trackInfoLabel;
 	private JLabel placeholder;
 
-	
+
 	public JMenuItem menuPlay = new JMenuItem("Play");
 	public JMenuItem menuQueue = new JMenuItem("Queue");
-	public JMenuItem menuList = new JMenuItem("Add to playlist");
-	public JMenuItem menuStar = new JMenuItem("Star");
+
+	public JMenu menuList = new JMenu("Add to playlist");
 
 	private JButton playpause = new JButton("Play");
 	private JButton next = new JButton("Next");
@@ -93,22 +91,22 @@ MouseListener {
 	private boolean newTrack;
 
 	private String trackName = "";
-	
-	//TODO Variabel som används för att hålla kolla på föregående index i listan av låtar
+
+	//Variabel som används för att hålla kolla på föregående index i listan av låtar
 	private ArrayList<Integer> previousTrackIndex = new ArrayList<Integer>();
 	private int TRACK_INDEX;
 	private boolean shuffle;
 	private boolean repeat;
 
-	public MusicPlayerGUI() {
+	public MusicPlayerGUI2() {
 
 		setVisible(true);
 
 		setLayout(new GridBagLayout());
-
-		setSize(1100, 660);
+		
 		setMinimumSize(new Dimension(800, 580));
-
+		setSize(new Dimension(1100, 660));
+		
 		//setResizable(false);
 
 		setLocationRelativeTo(null);
@@ -124,14 +122,20 @@ MouseListener {
 		setBorders();
 
 		createPopupMenu();
+		
+		savePreferences();
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		player = new MusicPlayer();
-		
-		shuffle = false;
-		
-		repeat = false;
+	}
+
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				new MusicPlayerGUI2();
+			}
+		});
 	}
 
 	/**
@@ -177,15 +181,21 @@ MouseListener {
 
 		trackTimeSlider = new JSlider(0, (w-50), 0);
 		trackTimeSlider.setPreferredSize(new Dimension(w-50, 20));
-		trackTimeSlider.setBackground(WINDOW_GREY);
-		trackTimeSlider.setForeground(TRACKLIST_GREY);
 
 		trackInfoBar.add(previous);
 		trackInfoBar.add(playpause);
 		trackInfoBar.add(next);
 		trackInfoBar.add(shuffleButton);
 		trackInfoBar.add(trackTimeSlider);
-		trackInfoBar.add(repeatButton);
+		
+
+		for(int i = 0; i<playlistStrings.length; i++) {
+			JMenuItem listItem = new JMenuItem(playlistStrings[i]);
+			menuList.add(listItem);
+			listItem.setActionCommand(playlistStrings[i]);
+			listItem.addActionListener(this);
+
+		}
 
 		playpause.addActionListener(this);
 		next.addActionListener(this);
@@ -194,6 +204,8 @@ MouseListener {
 		repeatButton.addActionListener(this);
 
 		playing = false;
+		shuffle = false;
+		repeat = false;
 		newTrack = true;
 
 		setJMenuBar(menuBar);
@@ -285,10 +297,14 @@ MouseListener {
 		tracklist.setSelectionBackground(WINDOW_GREY);
 		tracklist.setFixedCellHeight(18);
 		tracklist.setFont(MAIN_FONT);
+		tracklist.setCellRenderer(new MyCellRenderer());
 
 		playlist.setBackground(PLAYLIST_GREY);
 		playlist.setForeground(Color.WHITE);
 		tracklist.setFixedCellHeight(20);
+
+		trackTimeSlider.setBackground(WINDOW_GREY);
+		trackTimeSlider.setForeground(TRACKLIST_GREY);
 
 		titleLabel.setBackground(TRACKLIST_GREY);
 		titleLabel.setOpaque(true);
@@ -300,7 +316,8 @@ MouseListener {
 		placeholder.setOpaque(true);
 
 		trackInfoBar.setBackground(WINDOW_GREY);
-		tracklist.setCellRenderer(new MyCellRenderer());
+
+
 	}
 
 	/** Method to set all the borders */
@@ -344,11 +361,9 @@ MouseListener {
 		menuPlay.addActionListener(this);
 		menuQueue.addActionListener(this);
 		menuList.addActionListener(this);
-		menuStar.addActionListener(this);
 
 		popup.add(menuPlay);
 		popup.add(menuQueue);
-		popup.add(menuStar);
 		popup.add(menuList);
 
 		// Add listener to the text area so the popup menu can come up.
@@ -357,17 +372,29 @@ MouseListener {
 		titleLabel.addMouseListener(popupListener);
 	}
 
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				new MusicPlayerGUI();
-			}
-		});
+	/** Method used to save the preferences between sessions TODO - Fix this*/
+	private void savePreferences() {
+		Properties prop = new Properties();
+		
+		String [] playlists = playlistStrings;
+		 
+    	try {
+    		//For-loop is reversed to ensure correct file numbering
+    		for(int i = 0; i < playlists.length; i++) {
+    			prop.setProperty("playlistNumber" + i + "", playlists[i]);
+    		}
+ 
+    		//save properties to desired folder
+    		prop.store(new FileOutputStream("C:\\Users\\Marcus\\Desktop\\config.properties"), null);
+    		
+    		System.out.println("Prefs created");
+ 
+    	} catch (IOException ex) {
+    		ex.printStackTrace();
+        }
 	}
 	
-	/**
-	 * Method to help the shuffle-function
-	 */
+	/** Method to help the shuffle-function */
 	private int getRandomTrackIndex(){
 		Random rand = new Random();
 		int random = rand.nextInt(tracklist.getModel().getSize());
@@ -393,23 +420,22 @@ MouseListener {
 			}
 		}
 	}
-	/**
-	 * Method to keep track of and play the previously played tracks
-	 */
-	private void playPreviousTrack() {
-			tracklist.setSelectedIndex(previousTrackIndex.get(previousTrackIndex.size() - 1));
-			previousTrackIndex.remove(previousTrackIndex.size() - 1);
-			repaint();
-			playTrack();
-	}
 	
+	/** Method to keep track of and play the previously played tracks */
+	private void playPreviousTrack() {
+		tracklist.setSelectedIndex(previousTrackIndex.get(previousTrackIndex.size() - 1));
+		previousTrackIndex.remove(previousTrackIndex.size() - 1);
+		repaint();
+		playTrack();
+	}
+
 	private void setPreviousTrackIndex() {
-			//Unless you are playing and pausing the same track over and over again, this sets the previous track index
-			if (tracklist.getSelectedIndex() == TRACK_INDEX) {
-			} else {
-				previousTrackIndex.add(tracklist.getSelectedIndex());
-				TRACK_INDEX = previousTrackIndex.get(previousTrackIndex.size() - 1);
-			}
+		//Unless you are playing and pausing the same track over and over again, this sets the previous track index
+		if (tracklist.getSelectedIndex() == TRACK_INDEX) {
+		} else {
+			previousTrackIndex.add(tracklist.getSelectedIndex());
+			TRACK_INDEX = previousTrackIndex.get(previousTrackIndex.size() - 1);
+		}
 	}
 
 	/** Method invoked when music is to be played - TODO Städa här maybe?*/
@@ -429,12 +455,12 @@ MouseListener {
 			newTrack = false;
 			playing = true;
 		}
-		
+
 	}
 
 	/** Method which basically check if you're playing or not, defining whether to play or pause.*/
 	private void pauseOrPlay() {
-		
+
 		if (!newTrack && !playing) {
 			player.resumePlaying();
 			playing = true;
@@ -446,13 +472,13 @@ MouseListener {
 		}
 
 	}
-	
+
 	//TODO Vet ej hur jag ska göra detta, har inte hittat så mkt på internet
 	private void moveSlider(){
 		int frames = getFrameCount();
 		trackTimeSlider.setExtent(10);
 	}
-	
+
 	private int getFrameCount(){
 		int frames = player.getLengthInFrames();
 		return frames;
@@ -461,6 +487,10 @@ MouseListener {
 	@Override /** Usual ActionPerformed class, this is where the stuff happens. */
 	public void actionPerformed(ActionEvent a) {
 
+		if(a.getActionCommand().equals("NEW PLAYLIST")) {
+			System.out.println("Attempting to create new playlist"); //TODO - Creating playlists, fuck.
+		}
+		
 		if (a.getSource() == menuPlay) {
 			setPreviousTrackIndex();
 			playTrack();
@@ -477,15 +507,19 @@ MouseListener {
 			playTrack();
 		}
 
+		
+		
 		if (a.getSource() == next) {
 			setPreviousTrackIndex();
 			playNextTrack();
 		}
 		
+		
 		if (a.getSource() == previous) {
 			//If you have no songs that you previously have played or if you are back at the first song you played, the button won't do anything
 			//TODO Kanske kan göra den oklickbar här istället!
 			if(previousTrackIndex.size() == 0){
+				previous.setEnabled(false);
 			}
 			else{
 				playPreviousTrack();
@@ -514,6 +548,8 @@ MouseListener {
 			}
 		}
 		
+		
+
 	}
 
 	@Override
@@ -526,6 +562,7 @@ MouseListener {
 
 	}
 
+	
 	@Override
 	public void mousePressed(MouseEvent me) {
 		// This code snippet check that if the right mouse is clicked, the item
@@ -534,8 +571,6 @@ MouseListener {
 			tracklist.setSelectedIndex(tracklist.locationToIndex(me.getPoint()));
 		}
 	}
-
-
 
 	@Override
 	public void mouseEntered(MouseEvent me) {}
