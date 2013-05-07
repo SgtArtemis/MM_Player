@@ -8,7 +8,6 @@ package mm;
  * 	Saker som kan vara värda att tänka på:
  * 	- Ibland får vi NullPointerException lite överallt; t.ex om man trycker på "Play" utan att ha markerat en låt.
  * 
- * 
  * 	MAIN TODO
  * 	Panel med knappar och sliders
  * 	- Fixa så att JSlidern uppdateras allt eftersom låten spelas.
@@ -25,13 +24,13 @@ package mm;
  * 	Menubar
  * 	- Preferences?
  * 	- Help?
- *  - "Back to Main List"
+ *  	- "Back to Main List"
  *  
- *  Övrigt
- *  - Se till att JLabeln skriver ut vilken låt som spelas atm.
- *  - Search/Filter-funktion
- *  - Fixa så att man skriver in DIRECTORY via en JInputPane (?)
- *  - Reklam? ;D
+ *  	Övrigt
+ *  	- Se till att JLabeln skriver ut vilken låt som spelas atm.
+ *  	- Search/Filter-funktion
+ *  	- Fixa så att man skriver in DIRECTORY via en JInputPane (?)
+ *  	- Reklam? ;D
  * 
  */
 
