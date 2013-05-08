@@ -7,6 +7,8 @@ Då vi inte har börjat med detta är detaljerna ganska oklara om alla delar som
 - Skapandet av spellistor är fullt funktionellt, även uppspelning.
 Nästa steg är att se till att listorna sparas mellan sessioner
 
+**Vi måste titta lite mer på spellistorna, t ex add to playlist**
+
 ■ Panelen med alla knappar och slidern
 
 - Fixa slidern så att den uppdateras i takt med att låten spelas.
@@ -20,21 +22,15 @@ formerna på knapparna!
 
 - Titta mer på synkronisering osv. Behövs det verkligen? Kan vi göra programmet snabbare?
 
-- Fixa så att låtar kan spelas automatiskt när en låt är slut.
-
 - Fixa så att repeat fungerar på samma sätt, när sista låten är spelad, startas listan om 
 igen.
 
-- Fixa Repeat-One-Song?
+- Fixa Repeat-One-Song? (Tycker detta är en sak vi inte ska prioritera)
 
 - Vill vi ha att man ska kunna dra i JSlidern för att säga vart i låten man ska spela ifrån?
-Bra funktion, potentiellt svårt att fixa på ett bra sätt.
+Bra funktion, potentiellt svårt att fixa på ett bra sätt. (Imo, nej, blir jobbigt, men om vi får tid över, visst)
 
 ■ Högerklickspopup
-
-- Fixa queue. Fixar vi automatisk uppspelning ska detta inte vara alltför svårt!
-
-- Behövs star-funktionen?
 
 - Fixa add to playlist, när vi väl fått playlists att fungera.
 
@@ -45,8 +41,6 @@ Bra funktion, potentiellt svårt att fixa på ett bra sätt.
 - Fixa hjälpknappen!
 
 - Fixa exit-knappen.
-
-- Back? Kan tas bort?
 
 ■ Övrigt
 
