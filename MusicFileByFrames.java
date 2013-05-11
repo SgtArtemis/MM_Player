@@ -1,10 +1,11 @@
-package mm;
 
 /**
  * PROJEKT INDA 2013 
  * Marcus Heine och Mark Hobro
  * 
  * TODO - VARFÖR SKA MAN SYNKA?!?!??!!?!?!?!?!?!?!?!!!!!!!!!!!!!!!!!!!!!!????????????????????????????????????????
+ * 
+ * Dunno, kan testa ta bort alla synchronized :D
  */
 
 import java.io.BufferedInputStream;
@@ -31,6 +32,8 @@ public class MusicFileByFrames
 	private int frameNumber;
 	private int resumePosition;
 	private String directory;
+	
+	private boolean songHasEnded;
 
 	public MusicFileByFrames(String directory) throws JavaLayerException {
 		this.directory = directory;
@@ -39,27 +42,17 @@ public class MusicFileByFrames
 		frameCount = getFrameCount(directory);
 		openBitstream(directory);
 		resumePosition = -1;
-	}
-
-	// Plays the file from the first frame to the last frame (the whole file)
-	public void play() throws JavaLayerException {
-		playFrames(0, frameCount);
+		songHasEnded = false;
 	}
 
 	//Play a whole file from a given frame
 	public void playFrom(int start) throws JavaLayerException {
+		songHasEnded = false;
 		playFrames(start, frameCount);
 	}
-
-	public boolean play(int frames) throws JavaLayerException
-	{
-		return playFrames(frameNumber, frameNumber + frames);
-
-	}
-
-	public boolean play(int start, int end) throws JavaLayerException
-	{
-		return playFrames(start, start + end);
+	
+	public boolean hasSongEnded(){
+		return songHasEnded;
 	}
 
 	// Get the number of frames of the file
@@ -70,12 +63,6 @@ public class MusicFileByFrames
 	// Get the current position of the file in frames
 	public int getPosition() {
 		return frameNumber;
-	}
-
-	// Sets the position where the file should start playing from when prompted
-	public void setPosition(int position) throws JavaLayerException {
-		pause();
-		resumePosition = position;
 	}
 
 	public void stop(){
@@ -101,13 +88,13 @@ public class MusicFileByFrames
 
 		System.out.println("Attempting to pause before syncing.");
 
-		
+
 
 		//synchronized (this) {
 			playing = false;
 			System.out.println("Attempting to pause after syncing.");
 		//}
-		
+
 		//resumePosition = frameNumber;
 
 	}
@@ -145,7 +132,11 @@ public class MusicFileByFrames
 				resumePosition = frameNumber;
 			}
 		}
-
+		
+		if(frameNumber == end){
+			songHasEnded = true;
+		}
+		
 		handleApparentStop();
 		return ok;
 	}
@@ -274,4 +265,3 @@ public class MusicFileByFrames
 		return true;
 	}
 }
-
