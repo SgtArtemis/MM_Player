@@ -37,6 +37,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import java.io.*;
+import java.util.Arrays;
 import java.net.*;
 
 import java.util.*;
@@ -50,7 +51,7 @@ import javazoom.jl.decoder.JavaLayerException;
 
 
 
-public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListener, WindowListener, KeyListener {
+public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListener, WindowListener, KeyListener, ComponentListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -64,14 +65,8 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 	public static final Font MAIN_FONT = new Font("Tahoma", Font.PLAIN, 13);
 
-	//TODO - Här är det enda stället du behöver ändra directory.
-	public String DIRECTORY = "C:\\Users\\Marcus\\Music\\Musik\\";
-	//public String DIRECTORY = "C:\\Users\\Mark\\Songs\\";
-
-	//TODO - Här bestäms vart "preferences" filen ska ligga; jag har lagt min på skrivbordet
-	public final String FILE_DIRECTORY = "C:\\Users\\Marcus\\Desktop\\config.properties";
-
-	//TODO - Parametrisera? Tål att tittas på om vi får tid
+	public String DIRECTORY = "";
+	
 	public JList tracklist;
 	public JList playlist;
 
@@ -79,13 +74,13 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 	public String[] playlistStrings;
 	public String[] tracklistStrings;
 
-	
+	Dimension scrollbarDimension = new Dimension(0, 0);
 
 	private JScrollPane trackGUI;
 
 	private JScrollPane playlistGUI;
 
-	public PlaylistHandler ph;
+	public PlaylistHandler ph = new PlaylistHandler();
 	public TrackHandler th;
 
 	private JMenuBar menuBar = new JMenuBar();
@@ -94,7 +89,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 	private MusicPlayer player;
 
-	private JPanel trackInfoBar;
+	private JPanel trackInfoBar = new JPanel();
 
 	private JLabel titleLabel;
 	private JLabel trackInfoLabel;
@@ -102,15 +97,16 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 	private JMenu menuList = new JMenu("Add to playlist");
 	private JMenu fileMenu = new JMenu("File");
-	private JMenu prefsMenu = new JMenu("Preferences");
+	private JMenu optionsMenu = new JMenu("Options");
 	private JMenu helpMenu = new JMenu("Help");
-	
+
 	public JMenuItem menuPlay;
 	public JMenuItem menuQueue;
 	public JMenuItem playMenuItem;
 	public JMenuItem backMenuItem;
 	public JMenuItem exitMenuItem;
-	public JMenuItem prefsMenuItem;
+	public JMenuItem cdMenuItem;
+	public JMenuItem scrollbarMenuItem;
 	public JMenuItem helpMenuItem;
 
 	private ImageIcon playIcon;
@@ -145,16 +141,13 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 	//List for the queue-function
 	private ArrayList<Integer> queueList = new ArrayList<Integer>();
-	
+
 	//List for the buttons to simplify the code
 	private ArrayList<JButton> listOfButtons = new ArrayList<JButton>();
 
 
 	public MusicPlayerGUI() throws IOException {
 
-		//setResizable(false);
-		
-		
 
 		setVisible(true);
 
@@ -163,31 +156,34 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		setMinimumSize(new Dimension(800, 580));
 		setSize(new Dimension(1100, 660));
 
-		//setResizable(false);
 
 		setLocationRelativeTo(null);
 
 		setTitle("MM Music Player");
-		
-		//askForDirectory(); //TODO - Add this
+
+		attemptToLoadPreferences();
+
+		askForDirectory();
+
+		initMenuBar();
 
 		initIcons();
 
 		initComponents();
-		
-		initMenuBar();
 
 		mainLayout();
+
+		updateBarLayout();
 
 		setColours();
 
 		setBorders();
 
-		attemptToLoadPreferences();
-
 		createPopupMenu();
 
 		updatePopupMenu();
+
+		addComponentListener(this);
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
@@ -214,7 +210,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		player = new MusicPlayer();
 
 		th = new TrackHandler(DIRECTORY);
-		ph = new PlaylistHandler();
+		//ph = new PlaylistHandler();
 
 		playlistStrings = ph.getPlaylists();
 		tracklistStrings = th.getTracks();
@@ -227,16 +223,20 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 		tracklist.setListData(tracklistStrings);
 		playlist.setListData(playlistStrings);
-		
+
 		titleLabel = new JLabel();
 		trackInfoLabel = new JLabel();
 		placeholder = new JLabel();
 
+		titleLabel.setText("Main Playlist");
+		titleLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
+		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
 		trackInfoBar = new JPanel();
-		
+
 		menuQueue = new JMenuItem("Queue");
 		menuPlay = new JMenuItem("Play");
-		
+
 		//TODO - Ändra för att se scrollbaren
 		//Om scrollbaren ska vara synlig eller inte; jag gillar när den inte är det ^^ fak uuuuu, mdi is the shit :D
 		trackGUI.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
@@ -255,21 +255,11 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		trackInfoLabel.addMouseListener(this);
 
 		playlist.addKeyListener(this);
-        
-        int w = this.getBounds().width;
+
+		int w = this.getBounds().width;
 		trackTimeSlider = new JSlider(0, 5000, 0);
 		trackTimeSlider.setPreferredSize(new Dimension(w-50, 20));
 		trackTimeSlider.setEnabled(false);
-
-		trackInfoBar.setLayout(new FlowLayout());
-
-		trackInfoBar.add(repeatButton);
-		trackInfoBar.add(shuffleButton);
-		trackInfoBar.add(previousButton);
-		trackInfoBar.add(playpauseButton);
-		trackInfoBar.add(nextButton);
-		trackInfoBar.add(playlistButton);
-		trackInfoBar.add(trackTimeSlider);
 
 		playpauseButton.addActionListener(this);
 		nextButton.addActionListener(this);
@@ -290,55 +280,58 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 	}
 
 
-	private void initMenuBar() { //TODO - this
-		
+	private void initMenuBar() { 
+
 		playMenuItem 		= new JMenuItem("Play");
 		backMenuItem		= new JMenuItem("Main list");
 		exitMenuItem 		= new JMenuItem("Exit");
-		prefsMenuItem 		= new JMenuItem("Preferences");
+		cdMenuItem 			= new JMenuItem("Change directory");
 		helpMenuItem 		= new JMenuItem("Help");
-		
+		scrollbarMenuItem	= new JMenuItem("Toggle scrollbar");
+
 		playMenuItem.addActionListener(this);
 		backMenuItem.addActionListener(this);
 		exitMenuItem.addActionListener(this);
-		prefsMenuItem.addActionListener(this);
+		cdMenuItem.addActionListener(this);
 		helpMenuItem.addActionListener(this);
+		scrollbarMenuItem.addActionListener(this);
 
 		fileMenu.add(playMenuItem);
 		fileMenu.add(backMenuItem);
 		fileMenu.add(exitMenuItem);
-		
-		prefsMenu.add(prefsMenuItem);
-		
+
+		optionsMenu.add(cdMenuItem);
+		optionsMenu.add(scrollbarMenuItem);
+
 		helpMenu.add(helpMenuItem);
 
 		menuBar.add(fileMenu);
-		menuBar.add(prefsMenu);
+		menuBar.add(optionsMenu);
 		menuBar.add(helpMenu);
-		
+
 		menuBar.setBackground(WINDOW_GREY);
 		menuBar.setBorder(BorderFactory.createMatteBorder(3, 3, 0, 3, Color.BLACK));
-		
+
 		fileMenu.setForeground(Color.black);
-		prefsMenu.setForeground(Color.black);
+		optionsMenu.setForeground(Color.black);
 		helpMenu.setForeground(Color.black);
-		
-		
-		
+
+		System.out.println("Finished the menu.");
+
 	}
-	
+
 	public void initIcons() throws MalformedURLException {
 
-		//TODO - Förlåt för ful kod D:
-		playIcon = new ImageIcon(new URL("http://i.imgur.com/kn2hKkH.png"));
-		pauseIcon = new ImageIcon(new URL("http://i.imgur.com/TxobZL0.png"));
-		nextIcon = new ImageIcon(new URL("http://i.imgur.com/YWler6v.png"));
-		previousIcon = new ImageIcon(new URL("http://i.imgur.com/lw0qPjs.png"));
-		shuffleTrueIcon = new ImageIcon(new URL("http://i.imgur.com/iNhpWFI.png"));
-		shuffleFalseIcon = new ImageIcon(new URL("http://i.imgur.com/UkIWGHM.png"));
-		repeatTrueIcon = new ImageIcon(new URL("http://i.imgur.com/wfrDPrA.png"));
-		repeatFalseIcon = new ImageIcon(new URL("http://i.imgur.com/lwIdSph.png"));
-		playlistIcon = new ImageIcon(new URL("http://i.imgur.com/2KJQRNS.png"));
+		//TODO - This part of the code is far from obvious. Please consult http://vimeo.com/20685294 to see how we solved this.
+		playIcon = new ImageIcon(getClass().getResource("play.png"));
+		pauseIcon = new ImageIcon(getClass().getResource("pause.png"));
+		nextIcon = new ImageIcon(getClass().getResource("next.png"));
+		previousIcon = new ImageIcon(getClass().getResource("previous.png"));
+		shuffleTrueIcon = new ImageIcon(getClass().getResource("shuffle_true.png"));
+		shuffleFalseIcon = new ImageIcon(getClass().getResource("shuffle_false.png"));
+		repeatTrueIcon = new ImageIcon(getClass().getResource("repeat_all.png"));
+		repeatFalseIcon = new ImageIcon(getClass().getResource("repeat_false.png"));
+		playlistIcon = new ImageIcon(getClass().getResource("new_playlist.png"));
 
 		playpauseButton = new JButton(playIcon);
 		nextButton = new JButton(nextIcon);
@@ -364,19 +357,36 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		playlistButton.setPreferredSize(new Dimension(208, 48));
 		playlistButton.setBorder(null);
 
+		repeatButton.setBackground(WINDOW_GREY);
+		repeatButton.setPreferredSize(new Dimension(35, 35));
+		repeatButton.setBorder(null);
+
+		shuffleButton.setBackground(WINDOW_GREY);
+		shuffleButton.setPreferredSize(new Dimension(35, 35));
+		shuffleButton.setBorder(null);
+
 
 
 	}
 
-	private void askForDirectory() {
-		String dir = JOptionPane.showInputDialog("HELLO AND WELCOME FÖR FAN. WRITE THE DIRECTRY LOL");
-		if(dir == null)
-			System.exit(0);
+	private void askForDirectory() { //TODO - Fis this; this is the first message we get
 		
-		while(dir.equals(""))
-			dir = JOptionPane.showInputDialog("HELLO AND WELCOME FÖR FAN. WRITE THE DIRECTRY LOgsdfk\najhgbskjfgadslkfgadskjfghdökfgsadkgfjhkjsdfhkijdhfkljsdahgfkjgfhkajsdfghkadjshfkljsdhflskdjhfL");
-		
-		this.DIRECTORY = dir;
+		//If the DIRECTORY is *not* empty it means it's been changed by the preferences
+		if(DIRECTORY.equals("")) {
+			String dir = JOptionPane.showInputDialog("HELLO AND WELCOME FÖR FAN. WRITE THE DIRECTRY LOL");
+			if(dir == null)
+				System.exit(0);
+
+			//If the user doesn't write anything
+			while(dir.equals("")) 
+				dir = JOptionPane.showInputDialog("HELLO AND WELCOME FÖR FAN. WRITE THE DIRECTRY LOgsdfk\nL");
+
+			//If you're using Windows and the directory "seems" incomplete, finish it.
+			if(System.getProperty("os.name").startsWith("Win") && !dir.endsWith("\\"))
+				dir = dir.concat("\\");
+
+			this.DIRECTORY = dir;
+		}
 	}
 
 	private void updatePopupMenu() {
@@ -456,7 +466,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		add(trackInfoLabel, c);
 
 		// c.fill = GridBagConstraints.BOTH;
-		c.ipady = 68;
+		c.ipady = 110;
 		c.ipadx = 20;
 		c.weightx = 0.0;
 		c.weighty = 1.0;
@@ -468,6 +478,54 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 	}
 
+
+	private void updateBarLayout() {
+		SpringLayout sl = new SpringLayout();
+		trackInfoBar.setLayout(sl);
+
+		//trackInfoBar.setPreferredSize(new Dimension(4000, 200));
+
+		int width = this.getWidth();
+
+		trackInfoBar.add(repeatButton);
+
+		trackInfoBar.add(shuffleButton);
+
+
+		trackInfoBar.add(shuffleButton);
+
+		trackInfoBar.add(previousButton);
+
+		trackInfoBar.add(playpauseButton);
+		trackInfoBar.add(nextButton);
+		trackInfoBar.add(playlistButton);
+
+		trackInfoBar.add(trackTimeSlider);
+
+		sl.putConstraint(SpringLayout.WEST, repeatButton, 55, SpringLayout.WEST, this);
+		sl.putConstraint(SpringLayout.NORTH, repeatButton, 25, SpringLayout.NORTH, this);
+
+		sl.putConstraint(SpringLayout.WEST, shuffleButton, 10, SpringLayout.EAST, repeatButton);
+		sl.putConstraint(SpringLayout.NORTH, shuffleButton, 25, SpringLayout.NORTH, this);
+
+		sl.putConstraint(SpringLayout.NORTH, previousButton, 5, SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, previousButton, (width/2)-150, SpringLayout.WEST, this);
+
+		sl.putConstraint(SpringLayout.NORTH, playpauseButton, 5, SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, playpauseButton, 20, SpringLayout.EAST, previousButton);
+
+		sl.putConstraint(SpringLayout.NORTH, nextButton, 5, SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, nextButton, 20, SpringLayout.EAST, playpauseButton);
+
+		sl.putConstraint(SpringLayout.NORTH, playlistButton, 15, SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, playlistButton, width-250, SpringLayout.WEST, this);
+
+		sl.putConstraint(SpringLayout.NORTH, trackTimeSlider, 80, SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, trackTimeSlider, 20, SpringLayout.WEST, this);
+
+		trackTimeSlider.setPreferredSize(new Dimension(width-60, 20));
+
+	}
 
 	/** Method to set all the colours */
 	private void setColours() {
@@ -487,6 +545,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		trackTimeSlider.setForeground(TRACKLIST_GREY);
 
 		titleLabel.setBackground(TRACKLIST_GREY);
+		titleLabel.setForeground(Color.WHITE);
 		titleLabel.setOpaque(true);
 
 		trackInfoLabel.setBackground(LABEL_GREY);
@@ -552,7 +611,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		String [] playlists = ph.getPlaylists();
 
 		//Clear the file; this is probably inefficient, but it works.
-		PrintWriter writer = new PrintWriter(FILE_DIRECTORY);
+		PrintWriter writer = new PrintWriter("config.properties");
 		writer.print("");
 		writer.close();
 
@@ -561,7 +620,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		try
 		{
 			//Create a FileWriter; i.e a tool that writes text to a file.
-			FileWriter fw = new FileWriter(FILE_DIRECTORY, true);
+			FileWriter fw = new FileWriter("config.properties", true);
 
 			fw.write("directory=" + DIRECTORY + "\n"); //Appends the directory name to the file
 
@@ -594,41 +653,57 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 	/** Method which attempts to read the file set by savePreferences(). */
 	private void attemptToLoadPreferences() throws IOException {
 
-		BufferedReader br = new BufferedReader(new FileReader(FILE_DIRECTORY));
-		String line = "";
-		String nameOfPlaylist = "";
-		String nameOfSong = "";
+		try {
+			BufferedReader br = new BufferedReader(new FileReader("config.properties"));
+			String line = "";
+			String nameOfPlaylist = "";
+			String nameOfSong = "";
 
-		//As long as there is more to read, attempt to parse the information.
-		while ((line = br.readLine()) != null) {
+			ph = new PlaylistHandler();
 
-			if(line.startsWith("directory=")) {
-				line = line.replace("directory=", "");
-				DIRECTORY = line;
-				System.out.println("Directory has been read.");
+			//As long as there is more to read, attempt to parse the information.
+			while ((line = br.readLine()) != null) {
+
+				if(line.startsWith("directory=")) {
+					line = line.replace("directory=", "");
+					DIRECTORY = line;
+
+					if(System.getProperty("os.name").startsWith("Win") && !DIRECTORY.endsWith("\\"))
+						DIRECTORY = DIRECTORY.concat("\\");
+				}
+
+				//If a playlist is found; get the name of the list and add it to the GUI.
+				if(line.startsWith("playlist=")) {
+					nameOfPlaylist = line.substring(9);
+					ph.createAndAddPlaylist(nameOfPlaylist);
+				}
+
+				//If a song is found, add it to the playlist. This works because of the way we write the song names to this file.
+				else if(line.startsWith("song=")) {
+					nameOfSong = line.substring(5);
+					ph.addToPlaylist(nameOfPlaylist, nameOfSong);
+				}
+
+				else if(line.equals("Done."))
+					break;
 			}
 
-			//If a playlist is found; get the name of the list and add it to the GUI.
-			if(line.startsWith("playlist=")) {
-				nameOfPlaylist = line.substring(9);
-				ph.createAndAddPlaylist(nameOfPlaylist);
-			}
 
-			//If a song is found, add it to the playlist. This works because of the way we write the song names to this file.
-			else if(line.startsWith("song=")) {
-				nameOfSong = line.substring(5);
-				ph.addToPlaylist(nameOfPlaylist, nameOfSong);
-			}
-
-			else if(line.equals("Done."))
-				break;
+			System.out.println("Preferences loaded.");
+			br.close();
+		}
+		catch(IOException exc) {
+			System.out.println("No file found lol.");
 		}
 
-		playlistStrings = ph.getPlaylists();
-		playlist.setListData(playlistStrings);
+	}
 
-		System.out.println("Preferences loaded.");
-		br.close();
+
+	private void changeDirectory(){
+		this.DIRECTORY = JOptionPane.showInputDialog("Enter the directory in which you keep your .mp3 files.\nWhen you have done this, please restart the program.");
+
+		if(System.getProperty("os.name").startsWith("Win") && !DIRECTORY.endsWith("\\"))
+			DIRECTORY = DIRECTORY.concat("\\");
 	}
 
 	/** Method to help the shuffle-function. */
@@ -702,7 +777,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 	}
 
-	/** Method invoked when music is to be played - TODO Städa här maybe?*/
+	/** Method invoked when music is to be played */
 	private void playTrack() {
 		stopTimer();
 
@@ -729,21 +804,29 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 
 	private void setLabelText() {
-		
+
 		String trackName = (String) tracklist.getSelectedValue();
 		trackInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);		
 		trackInfoLabel.setText(trackName);
-		
-		if(trackName.length() > 50)
-			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 6));
-		else if(trackName.length() > 40)
-			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 8));
-		else if(trackName.length() > 30)
-			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 10));
-		else
+
+		if(trackName.length() < 20)
+			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		else if(trackName.length() < 28)
 			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-		
+		else if(trackName.length() < 36)
+			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
+		else
+			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 10));
+
 		setTitle("MM Music Player - " + (String) tracklist.getSelectedValue());
+
+		titleLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
+		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		if(playlist.getSelectedValue() == null)
+			titleLabel.setText("Main Playlist");
+		else
+			titleLabel.setText((String) playlist.getSelectedValue());
+
 	}
 
 	/** Methods that "moves" the JSlider to represent a position in the song*/
@@ -753,7 +836,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		trackTimeSlider.setMaximum(totalFrames + 1);
 		trackTimeSlider.setValue(currentFrame);
 	}
-	
+
 	/** Create a playlist*/
 	public void createPlaylist() {
 
@@ -803,18 +886,15 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 				playPreviousTrack();
 			}
 		}
-		
-		//TODO Kan ju lägga till så att det syns om shuffle är på eller inte, med färg eller text, whatever
+
 		if (a.getSource() == shuffleButton) {
 			if(shuffle == false){
 				shuffle = true;
 				shuffleButton.setIcon(shuffleTrueIcon);
-				System.out.println("Shuffle is set to on.");
 			}
 			else if(shuffle == true){
 				shuffle = false;
 				shuffleButton.setIcon(shuffleFalseIcon);
-				System.out.println("Shuffle is set to off.");
 			}
 		}
 		//Repeats the whole tracklist when it's done
@@ -822,20 +902,18 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 			if(repeat == false){
 				repeat = true;
 				repeatButton.setIcon(repeatTrueIcon);
-				System.out.println("Repeat is set to on.");
 			}
 			else if(repeat == true){
 				repeat = false;
 				repeatButton.setIcon(repeatFalseIcon);
-				System.out.println("Repeat is set to off.");
 			}
 		}
-		
-		//TODO
+
+		//TODO - Fix this help menu
 		if(a.getSource() == helpMenuItem) {
-			JOptionPane.showMessageDialog(this, "Hjälp mig för fan");
+			JOptionPane.showMessageDialog(this, "Hjälp för fan.");
 		}
-		
+
 		if(a.getSource() == exitMenuItem) {
 			try {
 				savePreferences();
@@ -843,17 +921,31 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 			System.exit(0);
 		}
-		
-		if(a.getSource() == prefsMenuItem) {
-			//updatePreferences(); //TODO
+
+
+		if(a.getSource() == cdMenuItem) {
+			changeDirectory();
 		}
-		
+
+		if(a.getSource() == scrollbarMenuItem) {
+			if(trackGUI.getVerticalScrollBar().getSize().width == 0) {
+				trackGUI.getVerticalScrollBar().setPreferredSize(new Dimension(18, this.getHeight()));
+				trackGUI.getVerticalScrollBar().setValue(trackGUI.getVerticalScrollBar().getValue() + 1);
+			}
+
+			else {
+				trackGUI.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
+				trackGUI.getVerticalScrollBar().setValue(trackGUI.getVerticalScrollBar().getValue() - 1);
+			}
+		}
+
 		if(a.getSource() == backMenuItem) {
 			System.out.println("Attempting to restore main list.");
+			titleLabel.setText("Main Playlist");
 			th.listTracks();
 			tracklist.setListData(th.getTracks());
 		}
-		
+
 		if(a.getSource() == playMenuItem) {
 			setPreviousTrackIndex();
 			playTrack();
@@ -887,9 +979,9 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		tim.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				
+
 				moveSlider();
-				
+
 				if(tracklist.getSelectedValue() == null) {
 					playpauseButton.setEnabled(false);
 					nextButton.setEnabled(false);
@@ -900,7 +992,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 					nextButton.setEnabled(true);
 					previousButton.setEnabled(true);
 				}
-				
+
 				if(player.hasSongEnded()) {
 					if(repeat == true && tracklist.getSelectedIndex() == tracklist.getModel().getSize()-1){
 						tracklist.setSelectedIndex(0);
@@ -926,22 +1018,29 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 	@Override
 	public void mouseClicked(MouseEvent me) {
 		if (me.getButton() == MouseEvent.BUTTON1 && me.getClickCount() >= 2) {
-			if(tracklist.hasFocus()) { //Double-clicked somewhere within the tracklist.
+			if(me.getSource() == tracklist) { //Double-clicked somewhere within the tracklist.
 				System.out.println("Du har dubbelklickat på en låt: " + tracklist.getSelectedValue());
 				setPreviousTrackIndex();
 				playTrack();
 				playpauseButton.setIcon(pauseIcon);
 			}
-			else if(playlist.hasFocus()) { //Double-clicked somewhere within the list of playlists.
+			else if(me.getSource() == playlist) { //Double-clicked somewhere within the list of playlists.
 				if(playlist.getSelectedValue() != null) {
 					System.out.println("Attempting to switch playlists");
+
+					titleLabel.setText((String) playlist.getSelectedValue());
 
 					//Update the tracklist so that it shows the list of tracks in the specified playlist.
 					tracklist.setListData(ph.getSpecificPlaylist((String) playlist.getSelectedValue()));
 				}
 			}
 			else {
-				System.out.println("SCROLL");
+				JScrollBar bar = trackGUI.getVerticalScrollBar();
+				String [] tracks = th.getTracks();
+
+				int trackPos = Arrays.asList(tracks).indexOf(tracklist.getSelectedValue());
+
+				bar.setValue((trackPos*19));
 			}
 		}
 	}
@@ -980,6 +1079,11 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		}
 	}
 
+	@Override
+	public void componentResized(ComponentEvent arg0) {
+		updateBarLayout();		
+	}
+
 
 	//Methods required by the Interfaces
 	public void mouseEntered(MouseEvent me) {}
@@ -995,6 +1099,11 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 	public void keyPressed(KeyEvent ke) {}
 	public void keyTyped(KeyEvent ke) {}
+
+	public void componentHidden(ComponentEvent arg0) {}
+	public void componentMoved(ComponentEvent arg0) {}
+	public void componentShown(ComponentEvent arg0) {}
+
 
 }
 

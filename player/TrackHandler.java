@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FilenameFilter;
 
+import javax.swing.JOptionPane;
+
 public class TrackHandler {
 
 	private String[] filenames;
@@ -33,15 +35,19 @@ public class TrackHandler {
 
 		filenames = directory.list(filefilter);
 
-		//TODO - Note, if the directory is faulty, we get an exception here.
-		try {
+		if(filenames != null) {
 			for (int i = 0; i < filenames.length; i++) {
 				String name = filenames[i].replace(".mp3", "");
 				filenames[i] = name;
 			}
-		} catch(NullPointerException nullExec) {
-			System.out.println("No files in the directory.");
 		}
+		else {
+			filenames = new String [1];
+			filenames[0] = "";
+			JOptionPane.showMessageDialog(null, "The directory seems to be faulty.\nPlease change the directory via the menu.");
+		}
+		
+		System.out.println("Got here.");
 
 	}
 
