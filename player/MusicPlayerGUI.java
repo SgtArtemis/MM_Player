@@ -1,35 +1,35 @@
 /**
- * Projekt - INDA12 - Vårterminen 2013
+ * Projekt - INDA12 - Vï¿½rterminen 2013
  *
  * @author Marcus Heine & Mark Hobro
  *
- * 	Saker som kan vara värda att tänka på:
- * 	- Ibland får vi NullPointerException lite överallt; t.ex om man trycker på "Play" utan att ha markerat en låt.
+ * 	Saker som kan vara vÃ¤rda att tÃ¤nka pÃ¥:
+ * 	- Ibland fÃ¥r vi NullPointerException lite ï¿½verallt; t.ex om man trycker pï¿½ "Play" utan att ha markerat en lï¿½t.
  * 
  * 
  * 	MAIN TODO
  * 	Panel med knappar och sliders
- * 	- Fixa så att JSlidern uppdateras allt eftersom låten spelas.
- * 	- JSlider (eller liknande) för att ändra volym
+ * 	- Fixa sÃ¥ att JSlidern uppdateras allt eftersom lï¿½ten spelas.
+ * 	- JSlider (eller liknande) fï¿½r att ï¿½ndra volym
  * 	- Knapparna - Placering och design
  * 
  * 	Uppspelning
- * 	- Synkronisering; hur funkar det och behöver vi det?
- * 	- Fixa så att Repeat-All funkar
+ * 	- Synkronisering; hur funkar det och behï¿½ver vi det?
+ * 	- Fixa sï¿½ att Repeat-All funkar
  * 	- Implementera Repeat-One?
- * 	- Implementera att man ska kunna dra JSlidern och välja vartifrån i låten man ska spela? Svårt.
- * 	- Kö-funktion
+ * 	- Implementera att man ska kunna dra JSlidern och vï¿½lja vartifrï¿½n i lï¿½ten man ska spela? Svï¿½rt.
+ * 	- Kï¿½-funktion
  * 
  * 	Menubar
  * 	- Preferences?
  * 	- Help?
- *  - "Back to Main List"
+ *  	- "Back to Main List"
  *  
- *  Övrigt
- *  - Se till att JLabeln skriver ut vilken låt som spelas atm.
- *  - Search/Filter-funktion
- *  - Fixa så att man skriver in DIRECTORY via en JInputPane (?)
- *  - Reklam? ;D
+ *  	Ã–vrigt
+ *  	- Se till att JLabeln skriver ut vilken lï¿½t som spelas atm.
+ * 	 - Search/Filter-funktion
+ *  	- Fixa sÃ¥ att man skriver in DIRECTORY via en JInputPane (?)
+ *  	- Reklam? ;D
  * 
  */
 
@@ -136,7 +136,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 	private String trackName = "";
 	private int TRACK_INDEX;
 
-	//Variabel som används för att hålla kolla på föregående index i listan av låtar
+	//Variabel som anvï¿½nds fï¿½r att hï¿½lla kolla pï¿½ fï¿½regï¿½ende index i listan av lï¿½tar
 	private ArrayList<Integer> previousTrackIndex = new ArrayList<Integer>();
 
 	//List for the queue-function
@@ -237,8 +237,8 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		menuQueue = new JMenuItem("Queue");
 		menuPlay = new JMenuItem("Play");
 
-		//TODO - Ändra för att se scrollbaren
-		//Om scrollbaren ska vara synlig eller inte; jag gillar när den inte är det ^^ fak uuuuu, mdi is the shit :D
+		//TODO - ï¿½ndra fï¿½r att se scrollbaren
+		//Om scrollbaren ska vara synlig eller inte; jag gillar nï¿½r den inte ï¿½r det ^^ fak uuuuu, mdi is the shit :D
 		trackGUI.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
 		trackGUI.addMouseListener(this);
 
@@ -373,13 +373,13 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		
 		//If the DIRECTORY is *not* empty it means it's been changed by the preferences
 		if(DIRECTORY.equals("")) {
-			String dir = JOptionPane.showInputDialog("HELLO AND WELCOME FÖR FAN. WRITE THE DIRECTRY LOL");
+			String dir = JOptionPane.showInputDialog("HELLO AND WELCOME Fï¿½R FAN. WRITE THE DIRECTRY LOL");
 			if(dir == null)
 				System.exit(0);
 
 			//If the user doesn't write anything
 			while(dir.equals("")) 
-				dir = JOptionPane.showInputDialog("HELLO AND WELCOME FÖR FAN. WRITE THE DIRECTRY LOgsdfk\nL");
+				dir = JOptionPane.showInputDialog("HELLO AND WELCOME Fï¿½R FAN. WRITE THE DIRECTRY LOgsdfk\nL");
 
 			//If you're using Windows and the directory "seems" incomplete, finish it.
 			if(System.getProperty("os.name").startsWith("Win") && !dir.endsWith("\\"))
@@ -730,7 +730,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 				playTrack();
 			} else if (shuffle == false) {
 				setPreviousTrackIndex();
-				// TODO Detta måste testas!
+				// TODO Detta mï¿½ste testas!
 				if (repeat == true && tracklist.getSelectedIndex() == tracklist.getModel().getSize() - 1) {
 					tracklist.setSelectedIndex(0);
 					playTrack();
@@ -911,7 +911,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 		//TODO - Fix this help menu
 		if(a.getSource() == helpMenuItem) {
-			JOptionPane.showMessageDialog(this, "Hjälp för fan.");
+			JOptionPane.showMessageDialog(this, "Hjï¿½lp fï¿½r fan.");
 		}
 
 		if(a.getSource() == exitMenuItem) {
@@ -1005,7 +1005,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 				}
 
 			}
-		}, 100, 100); //TODO - Ändra här om vi vill att det ska uppdateras snabbare | Prestanda?
+		}, 100, 100); //TODO - ï¿½ndra hï¿½r om vi vill att det ska uppdateras snabbare | Prestanda?
 
 	}
 
@@ -1019,7 +1019,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 	public void mouseClicked(MouseEvent me) {
 		if (me.getButton() == MouseEvent.BUTTON1 && me.getClickCount() >= 2) {
 			if(me.getSource() == tracklist) { //Double-clicked somewhere within the tracklist.
-				System.out.println("Du har dubbelklickat på en låt: " + tracklist.getSelectedValue());
+				System.out.println("Du har dubbelklickat pï¿½ en lï¿½t: " + tracklist.getSelectedValue());
 				setPreviousTrackIndex();
 				playTrack();
 				playpauseButton.setIcon(pauseIcon);
