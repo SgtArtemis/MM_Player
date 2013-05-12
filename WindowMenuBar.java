@@ -1,5 +1,3 @@
-package mm;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,7 +34,7 @@ class WindowMenuBar extends JMenuBar implements ActionListener {
 	private JOptionPane jop;
 	private JDialog jdialog;
 	
-	public TrackHandler th;
+	//public TrackHandler th;
 
 	public WindowMenuBar(String dir) {
 		
@@ -53,8 +51,6 @@ class WindowMenuBar extends JMenuBar implements ActionListener {
 		exitMenuItem 		= new JMenuItem("Exit");
 		prefsMenuItem 		= new JMenuItem("Preferences");
 		helpMenuItem 		= new JMenuItem("Help");
-		
-		th = new TrackHandler(DIRECTORY);
 
 		fileMenu.add(playMenuItem);
 		fileMenu.add(backMenuItem);
@@ -77,7 +73,7 @@ class WindowMenuBar extends JMenuBar implements ActionListener {
 		jdialog.setTitle("Help");
 		jdialog.setModal(true);
 
-		//TODO L√§gg till den till huvudsk√§rmen, hittade inget bra smidigt s√§tt s√• pallade inte just nu
+		//TODO L‰gg till den till huvudsk‰rmen, hittade inget bra smidigt s‰tt sÂ pallade inte just nu
 		jdialog.setContentPane(jop);
 		jdialog.pack();
 		//jdialog.setLocationRelativeTo(null); 
@@ -99,7 +95,7 @@ class WindowMenuBar extends JMenuBar implements ActionListener {
 	}
 
 	@Override
-	//TODO Detta √§r fucked up :D
+	//TODO Detta ‰r fucked up :D
 		public void actionPerformed(ActionEvent a) {
 			if(a.getSource() == helpMenuItem){
 				//jdialog.dispose();
@@ -108,7 +104,7 @@ class WindowMenuBar extends JMenuBar implements ActionListener {
 				System.exit(0);
 			}
 			if(a.getSource() == backMenuItem){
-				//TODO - Fixa s√• att den h√§r g√•r tillbaka till huvudlistan
+				//TODO - Fixa sÂ att den h‰r gÂr tillbaka till huvudlistan
 			}
 		}
 	

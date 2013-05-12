@@ -1,4 +1,4 @@
-  				     TODO
+﻿  				     TODO
 
 
 
@@ -21,8 +21,6 @@ Nästa steg är att se till att listorna sparas mellan sessioner
 *************************FIXED***********************************
 
 ■ Panelen med alla knappar och slidern
-
-- Fixa slidern så att den uppdateras i takt med att låten spelas.
 
 - Lägg till en typ av slider för att ändra volymen.
 

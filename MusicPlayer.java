@@ -40,9 +40,23 @@ public class MusicPlayer
 		}
 	}
 	
+	public boolean hasSongEnded() {
+		return framesPlayer.hasSongEnded();
+	}
+	
+	public int getPlayingPosition(){
+		
+		if(framesPlayer == null){
+			return 0;
+		}
+		else{
+			return framesPlayer.getPosition();
+		}
+	}
+	
 	public void play(String directory) throws JavaLayerException{
 		preparePlayer(directory);
-		playFrom(framesPlayer.getPosition());
+		playFrom(0);
 	}
 	
 	
@@ -51,15 +65,10 @@ public class MusicPlayer
         Thread playerThread = new Thread() {
             public void run()
             {
-                try {
-                    framesPlayer.playFrom(start);
-                }
-                catch(JavaLayerException e) {
-                    playerError();
-                }
-                finally{
-                	killPlayer();
-                }
+                    try {
+                    	framesPlayer.playFrom(start);
+						
+					} catch (JavaLayerException e) { e.printStackTrace(); }
             }
         };
         playerThread.setPriority(Thread.MIN_PRIORITY);
@@ -92,9 +101,7 @@ public class MusicPlayer
                     }
                     catch(JavaLayerException e) {
                         playerError();
-                    }
-                    finally{
-                    	 killPlayer();
+                        killPlayer();
                     }
                 }
             };
