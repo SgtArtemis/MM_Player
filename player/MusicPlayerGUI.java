@@ -870,9 +870,11 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		}
 
 		if (a.getSource() == playpauseButton) {
-			setPreviousTrackIndex();
-			pauseOrPlay();
-			playTrack();
+			if(tracklist.getSelectedValue() != null) {
+				setPreviousTrackIndex();
+				pauseOrPlay();
+				playTrack();
+			}
 		}
 
 		if (a.getSource() == nextButton) {
