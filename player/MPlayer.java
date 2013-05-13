@@ -25,7 +25,7 @@ import javazoom.jl.decoder.JavaLayerException;
 
 public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListener, WindowListener, KeyListener, ComponentListener {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	private Timer tim;
 
@@ -775,6 +775,32 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		startTimer();
 
 	}
+	//TODO DENNA OCH NÄSTA METOD
+	private void playSameTrack(){
+		stopTimer();
+		trackName = tracklist.getSelectedValue() + ".mp3";
+		try {
+			player.play(DIRECTORY + trackName);
+		} catch (JavaLayerException e) {
+			e.printStackTrace();
+		}
+		newTrack = false;
+		playing = true;
+		setLabelText();
+		startTimer();
+	}
+	
+	private void checkHowToPlay(){
+		setPreviousTrackIndex();
+		if(playing && TRACK_INDEX != tracklist.getSelectedIndex()){
+			pauseOrPlay();
+			playTrack();
+		}
+		else{
+			playSameTrack();
+		}
+		playpauseButton.setIcon(pauseIcon);
+	}
 
 
 	private void setLabelText() {
@@ -832,17 +858,9 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		if(a.getSource() == playlistButton) {
 			createPlaylist();
 		}
-
+		//TODO
 		if (a.getSource() == menuPlay) {
-			setPreviousTrackIndex();
-			if(playing){
-				pauseOrPlay();
-				playTrack();
-			}
-			else{
-				playTrack();
-			}
-			playpauseButton.setIcon(pauseIcon);
+			checkHowToPlay();
 		}
 
 		if (a.getSource() == menuQueue) {
@@ -902,7 +920,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 			}
 		}
 
-		//TODO - Fix this help menu
+		//TODO
 		if(a.getSource() == helpMenuItem) {
 			createHelpWindow();
 			jdialog.dispose();
@@ -964,7 +982,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 
 	}
-
+	//TODO
 	public void createHelpWindow(){
 		jop = new JOptionPane("If you need help, send an email to spytifo@hotmale.com", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
 		jdialog = new JDialog();
@@ -1025,15 +1043,8 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		if (me.getButton() == MouseEvent.BUTTON1 && me.getClickCount() >= 2) {
 			if(me.getSource() == tracklist) { //Double-clicked somewhere within the tracklist.
 				System.out.println("Du har dubbelklickat p� en l�t: " + tracklist.getSelectedValue());
-				setPreviousTrackIndex();
-				if(playing){
-					pauseOrPlay();
-					playTrack();
-				}
-				else{
-					playTrack();
-				}
-				playpauseButton.setIcon(pauseIcon);
+				//TODO
+				checkHowToPlay();
 			}
 			else if(me.getSource() == playlist) { //Double-clicked somewhere within the list of playlists.
 				if(playlist.getSelectedValue() != null) {
