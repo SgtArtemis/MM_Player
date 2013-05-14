@@ -1,11 +1,7 @@
-
 /**
  * PROJEKT INDA 2013 
  * Marcus Heine och Mark Hobro
  * 
- * TODO - VARFÖR SKA MAN SYNKA?!?!??!!?!?!?!?!?!?!?!!!!!!!!!!!!!!!!!!!!!!????????????????????????????????????????
- * 
- * Dunno, kan testa ta bort alla synchronized :D
  */
 
 import java.io.BufferedInputStream;
@@ -20,8 +16,7 @@ import javazoom.jl.decoder.SampleBuffer;
 import javazoom.jl.player.AudioDevice;
 import javazoom.jl.player.FactoryRegistry;
 
-public class MusicFileByFrames 
-{
+public class MusicFileByFrames {
 
 	private Bitstream bitstream;
 	private Decoder decoder;
@@ -32,7 +27,7 @@ public class MusicFileByFrames
 	private int frameNumber;
 	private int resumePosition;
 	private String directory;
-	
+
 	private boolean songHasEnded;
 
 	public MusicFileByFrames(String directory) throws JavaLayerException {
@@ -45,13 +40,13 @@ public class MusicFileByFrames
 		songHasEnded = false;
 	}
 
-	//Play a whole file from a given frame
+	// Play a whole file from a given frame
 	public void playFrom(int start) throws JavaLayerException {
 		songHasEnded = false;
 		playFrames(start, frameCount);
 	}
-	
-	public boolean hasSongEnded(){
+
+	public boolean hasSongEnded() {
 		return songHasEnded;
 	}
 
@@ -65,19 +60,18 @@ public class MusicFileByFrames
 		return frameNumber;
 	}
 
-	public void stop(){
+	public void stop() {
 		close();
 	}
 
-	private synchronized void close(){
+	private synchronized void close() {
 		if (audio != null) {
 			AudioDevice out = audio;
 			audio = null;
 			out.close();
 			try {
 				bitstream.close();
-			}
-			catch (BitstreamException ex) {
+			} catch (BitstreamException ex) {
 			}
 			bitstream = null;
 			decoder = null;
@@ -85,18 +79,7 @@ public class MusicFileByFrames
 	}
 
 	public void pause() throws JavaLayerException {
-
-		System.out.println("Attempting to pause before syncing.");
-
-
-
-		//synchronized (this) {
-			playing = false;
-			System.out.println("Attempting to pause after syncing.");
-		//}
-
-		//resumePosition = frameNumber;
-
+		playing = false;
 	}
 
 	public void resume() throws JavaLayerException {
@@ -124,7 +107,6 @@ public class MusicFileByFrames
 		// Play until finished, paused, or a problem.
 		boolean ok = true;
 
-		//TODO - IMPORTANT WHILE-LOOP
 		while (frameNumber < end && playing && ok) {
 			ok = decodeFrame();
 			if (ok) {
@@ -132,23 +114,23 @@ public class MusicFileByFrames
 				resumePosition = frameNumber;
 			}
 		}
-		
-		if(frameNumber == end){
+
+		if (frameNumber == end) {
 			songHasEnded = true;
 		}
-		
+
 		handleApparentStop();
 		return ok;
 	}
 
 	// Make sure the player is in the correct position
-	private synchronized void checkFramePosition(int startingPosition)
+	private void checkFramePosition(int startingPosition)
 			throws JavaLayerException {
 		moveTo(startingPosition);
 		playing = true;
 	}
 
-	private synchronized void handleApparentStop() {
+	private void handleApparentStop() {
 		playing = false;
 		// last frame, ensure all data flushed to the audio device.
 		AudioDevice out = audio;
@@ -170,7 +152,7 @@ public class MusicFileByFrames
 		}
 	}
 
-	private synchronized void handlePlayingPosition() throws JavaLayerException {
+	private void handlePlayingPosition() throws JavaLayerException {
 		if (bitstream != null) {
 			try {
 				bitstream.close();
@@ -234,8 +216,7 @@ public class MusicFileByFrames
 		return true;
 	}
 
-	private synchronized boolean handleFrameDecoding()
-			throws JavaLayerException {
+	private boolean handleFrameDecoding() throws JavaLayerException {
 		if (audio == null) {
 			return false;
 		}
