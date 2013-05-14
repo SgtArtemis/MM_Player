@@ -11,59 +11,25 @@
 
 
 ■ Spellistor
-****************************************************************
 
-Då vi inte har börjat med detta är detaljerna ganska oklara om alla delar som måste göras.
-- Skapandet av spellistor är fullt funktionellt, även uppspelning.
-Nästa steg är att se till att listorna sparas mellan sessioner
-**Vi måste titta lite mer på spellistorna, t ex add to playlist**
+Done.
 
-*************************FIXED***********************************
 
 ■ Panelen med alla knappar och slidern
 
-- Lägg till en typ av slider för att ändra volymen.
-
-- Fixa till knapparna så de blir snyggare! Kanske byta ut text mot ikoner och ändra 
-formerna på knapparna!
+Lägg till en typ av slider för att ändra volymen. //No.
 
 ■ Uppspelning
 
-****************************************
-- Titta mer på synkronisering osv. Behövs det verkligen? Kan vi göra programmet snabbare?
-
-- Fixa så att repeat fungerar på samma sätt, när sista låten är spelad, startas listan om 
-igen.
-****************************************
-
-- Fixa Repeat-One-Song? (Tycker detta är en sak vi inte ska prioritera)
-
-- Vill vi ha att man ska kunna dra i JSlidern för att säga vart i låten man ska spela ifrån?
+Vill vi ha att man ska kunna dra i JSlidern för att säga vart i låten man ska spela ifrån?
 Bra funktion, potentiellt svårt att fixa på ett bra sätt. (Imo, nej, blir jobbigt, men om vi får tid över, visst)
 
-■ Högerklickspopup
-*****************************
-- Fixa add to playlist, när vi väl fått playlists att fungera.
-*****************************
-■ Menubar
-
-- Preferences?
-
-- Fixa hjälpknappen!
-
-- Fixa exit-knappen.
 
 ■ Övrigt
 
 - Fakereklam? :D
-**********************************************
-- Visa vilken låt som spelas nere till vänster?
-**********************************************
+
 - Search/Filterfunktion
-
-- FIXA SÅ ATT MAN SKRIVER IN DIRECTORY SJÄLV
-(För att detta ska funka på ett bra sätt måste man dock kunna spara info mellan sessioner)
-
 
 
 //TODO Lägg till mer saker! LOL TODOception
