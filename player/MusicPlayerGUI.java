@@ -360,23 +360,33 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 	/** Method which, if applicable, asks for the directory where the files are. */
 	private void askForDirectory() {
-
+		
 		//If the DIRECTORY is *not* empty it means it's been changed by the preferences
 		if(DIRECTORY.equals("")) {
-			String message = "<html><div align='center'>Hello and welcome to Onyx!<br>Please enter the directory of your music files.<br>The directory should look something like C:\\Users\\Marcus\\Music\\ .</div></html>";
 			
+			final JFileChooser fc = new JFileChooser();
+			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			
+			String message = "<html><div align='center'>Hello and welcome to Onyx!<br>To get started, please navigate to the directory of your music files.</div></html>";
 			JLabel msgLabel = new JLabel(message, JLabel.CENTER);
-			
-			String dir = JOptionPane.showInputDialog(null, msgLabel, "Onyx Music Player", JOptionPane.INFORMATION_MESSAGE);
-			if(dir == null)
+			JOptionPane.showMessageDialog(null, msgLabel, "Onyx Music Player", JOptionPane.INFORMATION_MESSAGE);
+
+			int choice = fc.showOpenDialog(null);
+
+			if (choice == JFileChooser.APPROVE_OPTION) {
+				File dir = fc.getSelectedFile();
+
+				System.out.println(dir.toString());
+
+				this.DIRECTORY = dir.toString();
+
+				//If you're using Windows and the directory "seems" incomplete, finish it.
+				if(System.getProperty("os.name").startsWith("Win") && !DIRECTORY.endsWith("\\"))
+					DIRECTORY = DIRECTORY.concat("\\");
+
+			} else {
 				System.exit(0);
-
-
-			//If you're using Windows and the directory "seems" incomplete, finish it.
-			if(System.getProperty("os.name").startsWith("Win") && !dir.endsWith("\\"))
-				dir = dir.concat("\\");
-
-			this.DIRECTORY = dir;
+			}
 		}
 	}
 
