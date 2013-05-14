@@ -962,6 +962,8 @@ public class MusicPlayerGUI extends JFrame implements ActionListener,
 		}
 
 		if (a.getSource() == menuQueue) {
+			queueList.add(tracklist.getSelectedIndex());
+			System.out.println("Queued the track " + tracklist.getSelectedValue());
 			int scrollValue = trackGUI.getVerticalScrollBar().getValue();
 			trackName = trackName.replaceAll(".mp3", "");
 			tracklist.setSelectedValue(trackName, false);
@@ -978,16 +980,12 @@ public class MusicPlayerGUI extends JFrame implements ActionListener,
 		}
 
 		if (a.getSource() == nextButton) {
-			if (TRACK_INDEX != tracklist.getModel().getSize() - 1
-					&& repeat == false && shuffle == false) {
-				setPreviousTrackIndex();
 				if (playing && TRACK_INDEX != tracklist.getSelectedIndex()) {
 					pauseOrPlay();
 					playNextTrack();
 				} else {
 					playNextTrack();
 				}
-			}
 		}
 
 		if (a.getSource() == previousButton) {
