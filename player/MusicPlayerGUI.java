@@ -1,23 +1,23 @@
 /**
- * Projekt - INDA12 - Vårterminen 2013
+ * Projekt - INDA12 - VÃ¥rterminen 2013
  *
  * @author Marcus Heine & Mark Hobro
  *
- * 	Saker som kan vara värda att tänka på:
- * 	- Ibland får vi NullPointerException lite överallt; t.ex om man trycker på "Play" utan att ha markerat en låt.
+ * 	Saker som kan vara vÃ¤rda att tÃ¤nka pÃ¥:
+ * 	- Ibland fÃ¥r vi NullPointerException lite Ã¶verallt; t.ex om man trycker pÃ¥ "Play" utan att ha markerat en lÃ¥t.
  * 
  * 
  * 	MAIN TODO
  * 	Panel med knappar och sliders
- * 	- JSlider (eller liknande) för att ändra volym
+ * 	- JSlider (eller liknande) fÃ¶r att Ã¤ndra volym
  * 
  * 	Uppspelning
- * 	- Implementera att man ska kunna dra JSlidern och välja vartifrån i låten man ska spela? Svårt.
+ * 	- Implementera att man ska kunna dra JSlidern och vÃ¤lja vartifrÃ¥n i lÃ¥ten man ska spela? SvÃ¥rt.
  * 
  * 	Menubar
  * 	- Help?
  *  
- *  Övrigt
+ *  Ã–vrigt
  *  - Search/Filter-funktion
  *  - Reklam? ;D
  * 
@@ -892,9 +892,9 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 		}
 
 		if (a.getSource() == menuQueue) {
-			queueList.add(tracklist.getSelectedIndex());
+			int scrollValue = trackGUI.getVerticalScrollBar().getValue();
 			trackName = trackName.replaceAll(".mp3", "");
-			tracklist.setSelectedValue(trackName, true);
+			tracklist.setSelectedValue(trackName, false);
 		}
 
 		if (a.getSource() == playpauseButton) {
@@ -1013,7 +1013,7 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 				System.out.println("Attempting to add " + (String) tracklist.getSelectedValue() + " to " + listChoice);
 				ph.addToPlaylist(listChoice, (String) tracklist.getSelectedValue());
 				trackName = trackName.replaceAll(".mp3", "");
-				tracklist.setSelectedValue(trackName, true);
+				tracklist.setSelectedValue(trackName, false);
 			}
 		}
 
@@ -1097,12 +1097,13 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 			tim.cancel();
 	}
 
+	
 	/** Usual mouseClicked method, handles clicks in the PlaylistGUI and TrackGUI*/
 	@Override
 	public void mouseClicked(MouseEvent me) {
 		if (me.getButton() == MouseEvent.BUTTON1 && me.getClickCount() >= 2) {
 			if(me.getSource() == tracklist) { //Double-clicked somewhere within the tracklist.
-				System.out.println("Du har dubbelklickat på en låt: " + tracklist.getSelectedValue());
+				System.out.println("Du har dubbelklickat pÃ¥ en lÃ¥t: " + tracklist.getSelectedValue());
 				//TODO
 				checkHowToPlay();
 			}
