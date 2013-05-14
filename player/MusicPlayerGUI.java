@@ -1,23 +1,23 @@
 /**
- * Projekt - INDA12 - VÃ¥rterminen 2013
+ * Projekt - INDA12 - Vårterminen 2013
  *
  * @author Marcus Heine & Mark Hobro
  *
- * 	Saker som kan vara vÃ¤rda att tÃ¤nka pÃ¥:
- * 	- Ibland fÃ¥r vi NullPointerException lite Ã¶verallt; t.ex om man trycker pÃ¥ "Play" utan att ha markerat en lÃ¥t.
+ * 	Saker som kan vara värda att tänka på:
+ * 	- Ibland får vi NullPointerException lite överallt; t.ex om man trycker på "Play" utan att ha markerat en låt.
  * 
  * 
  * 	MAIN TODO
  * 	Panel med knappar och sliders
- * 	- JSlider (eller liknande) fÃ¶r att Ã¤ndra volym
+ * 	- JSlider (eller liknande) för att ändra volym
  * 
  * 	Uppspelning
- * 	- Implementera att man ska kunna dra JSlidern och vÃ¤lja vartifrÃ¥n i lÃ¥ten man ska spela? SvÃ¥rt.
+ * 	- Implementera att man ska kunna dra JSlidern och välja vartifrån i låten man ska spela? Svårt.
  * 
  * 	Menubar
  * 	- Help?
  *  
- *  Ã–vrigt
+ *  Övrigt
  *  - Search/Filter-funktion
  *  - Reklam? ;D
  * 
@@ -690,10 +690,25 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 
 	/** Method to change the directory, this should only be called from the Menu bar. */
 	private void changeDirectory(){
-		this.DIRECTORY = JOptionPane.showInputDialog("Enter the directory in which you keep your .mp3 files.\nWhen you have done this, please restart the program.");
+		final JFileChooser fc = new JFileChooser();
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		
+		String message = "<html><div align='center'>Navigate to the correct directory. <br>After you have clicked \"Open\", please restart the program.</div></html>";
+		JLabel msgLabel = new JLabel(message, JLabel.CENTER);
+		JOptionPane.showMessageDialog(null, msgLabel, "Onyx Music Player", JOptionPane.INFORMATION_MESSAGE);
 
-		if(System.getProperty("os.name").startsWith("Win") && !DIRECTORY.endsWith("\\"))
-			DIRECTORY = DIRECTORY.concat("\\");
+		int choice = fc.showOpenDialog(null);
+
+		if (choice == JFileChooser.APPROVE_OPTION) {
+			File dir = fc.getSelectedFile();
+
+			this.DIRECTORY = dir.toString();
+
+			//If you're using Windows and the directory "seems" incomplete, finish it.
+			if(System.getProperty("os.name").startsWith("Win") && !DIRECTORY.endsWith("\\"))
+				DIRECTORY = DIRECTORY.concat("\\");
+
+		}
 	}
 
 	/** Method to help the shuffle-function. */
@@ -1107,13 +1122,13 @@ public class MusicPlayerGUI extends JFrame implements ActionListener, MouseListe
 			tim.cancel();
 	}
 
-	
+
 	/** Usual mouseClicked method, handles clicks in the PlaylistGUI and TrackGUI*/
 	@Override
 	public void mouseClicked(MouseEvent me) {
 		if (me.getButton() == MouseEvent.BUTTON1 && me.getClickCount() >= 2) {
 			if(me.getSource() == tracklist) { //Double-clicked somewhere within the tracklist.
-				System.out.println("Du har dubbelklickat pÃ¥ en lÃ¥t: " + tracklist.getSelectedValue());
+				System.out.println("Du har dubbelklickat på en låt: " + tracklist.getSelectedValue());
 				//TODO
 				checkHowToPlay();
 			}
