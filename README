@@ -1,5 +1,16 @@
 This is a simple music player that can play your local files.
-It's design is based of Spotify's design, and I think we've come fairly close
+It's design is heavily based on Spotify's design, and I think we've come fairly close.
 
-This is a project for the course INDA12 at KTH.
+---
+
+Onyx Music Player was a project for the course INDA12 at KTH.
 It is a collaboration between Mark Hobro and Marcus Heine
+
+---
+
+It should (hopefully) ask for the directory in which you keep your local .mp3 files the first time you open the program.
+After the first time it will remember the directory.
+
+---
+
+Enjoy, and don't steal music :)
