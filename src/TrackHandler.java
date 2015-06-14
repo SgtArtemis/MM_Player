@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
+import java.util.Collections;
 
 import javax.swing.JOptionPane;
 
@@ -40,6 +42,7 @@ public class TrackHandler {
 				String name = filenames[i].replace(".mp3", "");
 				filenames[i] = name;
 			}
+			Arrays.sort(filenames);
 		}
 		else {
 			filenames = new String [1];

@@ -73,7 +73,7 @@ class WindowMenuBar extends JMenuBar implements ActionListener {
 		jdialog.setTitle("Help");
 		jdialog.setModal(true);
 
-		//TODO L‰gg till den till huvudsk‰rmen, hittade inget bra smidigt s‰tt sÂ pallade inte just nu
+		//TODO L√§gg till den till huvudsk√§rmen, hittade inget bra smidigt s√§tt s√• pallade inte just nu
 		jdialog.setContentPane(jop);
 		jdialog.pack();
 		//jdialog.setLocationRelativeTo(null); 
@@ -83,7 +83,7 @@ class WindowMenuBar extends JMenuBar implements ActionListener {
 
 	private void setLayout() {
 		
-		Border border = BorderFactory.createMatteBorder(3, 3, 0, 3, Color.BLACK);
+		Border border = BorderFactory.createMatteBorder(3, 3, 3, 3, Color.BLUE);
 		
 		setBackground(WINDOW_GREY);
 		setBorder(border);
@@ -95,7 +95,7 @@ class WindowMenuBar extends JMenuBar implements ActionListener {
 	}
 
 	@Override
-	//TODO Detta ‰r fucked up :D
+	//TODO Detta √§r fucked up :D
 		public void actionPerformed(ActionEvent a) {
 			if(a.getSource() == helpMenuItem){
 				//jdialog.dispose();
@@ -104,7 +104,7 @@ class WindowMenuBar extends JMenuBar implements ActionListener {
 				System.exit(0);
 			}
 			if(a.getSource() == backMenuItem){
-				//TODO - Fixa sÂ att den h‰r gÂr tillbaka till huvudlistan
+				//TODO - Fixa s√§ att den h√§r g√•r tillbaka till huvudlistan
 			}
 		}
 	

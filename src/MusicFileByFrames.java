@@ -1,7 +1,6 @@
 /**
  * PROJEKT INDA 2013 
  * Marcus Heine och Mark Hobro
- * 
  */
 
 import java.io.BufferedInputStream;
@@ -209,10 +208,12 @@ public class MusicFileByFrames {
 				return false;
 			}
 			bitstream.closeFrame();
-		} catch (RuntimeException ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new JavaLayerException("Exception decoding audio frame", ex);
 		}
+		
+		
 		return true;
 	}
 

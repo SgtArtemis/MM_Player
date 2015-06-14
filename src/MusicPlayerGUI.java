@@ -1,5 +1,5 @@
 /**
- * Projekt - INDA12 - Vårterminen 2013
+ * Projekt - INDA12 - VÃ¥rterminen 2013
  * 
  * KTH - Introduktion till Datalogi
  * 
@@ -9,15 +9,13 @@
 
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
-import java.util.Arrays;
-
 import java.util.*;
 import java.util.Timer;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 import javazoom.jl.decoder.JavaLayerException;
 
@@ -29,18 +27,18 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	private Timer tim;
 
 	/** Spotify Colour Scheme */
-//	public static final Color TRACKLIST_GREY = new Color(55, 55, 55);
-//	public static final Color LABEL_GREY = new Color(63, 63, 63);
-//	public static final Color PLAYLIST_GREY = new Color(70, 70, 70);
-//	public static final Color WINDOW_GREY = new Color(150, 150, 150);
+	public static final Color COLOR_TRACKLIST = new Color(55, 55, 55);
+	public static final Color COLOR_LABEL = new Color(63, 63, 63);
+	public static final Color COLOR_PLAYLIST = new Color(70, 70, 70);
+	public static final Color COLOR_WINDOW = new Color(120, 120, 120);
 	
 	/** Onyx Colour Scheme */
-	public static final Color TRACKLIST_GREEN = new Color(20, 80, 20);
-	public static final Color LABEL_GREEN = new Color(25, 90, 25);
-	public static final Color PLAYLIST_GREEN = new Color(20, 70, 20);
-	public static final Color WINDOW_GREEN = new Color(20, 70, 20);
+//	public static final Color COLOR_TRACKLIST = new Color(20, 80, 20);
+//	public static final Color COLOR_LABEL = new Color(25, 90, 25);
+//	public static final Color COLOR_PLAYLIST = new Color(20, 70, 20);
+//	public static final Color COLOR_WINDOW = new Color(20, 70, 20);
 
-	public static final Font MAIN_FONT = new Font("Tahoma", Font.BOLD, 12);
+	public static final Font MAIN_FONT = new Font("Verdana", Font.BOLD, 12);
 
 	public String DIRECTORY = "";
 
@@ -284,9 +282,8 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		menuBar.add(optionsMenu);
 		menuBar.add(helpMenu);
 
-		menuBar.setBackground(WINDOW_GREEN);
-		menuBar.setBorder(BorderFactory.createMatteBorder(3, 3, 0, 3,
-				Color.BLACK));
+		menuBar.setBackground(COLOR_WINDOW);
+		menuBar.setBorder(BorderFactory.createMatteBorder(3, 3, 1, 3, Color.BLACK));
 
 		fileMenu.setForeground(Color.black);
 		optionsMenu.setForeground(Color.black);
@@ -334,12 +331,12 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 
 		// Make each button a certain size and colour.
 		for (JButton b : listOfButtons) {
-			b.setBackground(WINDOW_GREEN);
+			b.setBackground(COLOR_WINDOW);
 			b.setPreferredSize(new Dimension(65, 65));
 			b.setBorder(null);
 		}
 
-		playlistButton.setBackground(WINDOW_GREEN);
+		playlistButton.setBackground(COLOR_WINDOW);
 		playlistButton.setPreferredSize(new Dimension(208, 48));
 		playlistButton.setBorder(null);
 
@@ -374,8 +371,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 
 				// If you're using Windows and the directory is incomplete,
 				// finish it.
-				if (System.getProperty("os.name").startsWith("Win")
-						&& !DIRECTORY.endsWith("\\"))
+				if (!DIRECTORY.endsWith("\\"))
 					DIRECTORY = DIRECTORY.concat("\\");
 
 			} else {
@@ -472,6 +468,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		c.gridy = 4;
 		add(trackInfoBar, c);
 
+
 	}
 
 	/** Set the layout of the bar below the tracks */
@@ -527,38 +524,39 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 				SpringLayout.WEST, this);
 
 		trackTimeSlider.setPreferredSize(new Dimension(width - 60, 20));
+		trackTimeSlider.setUI(new CustomSlider(trackTimeSlider));
 
 	}
 
 	/** Method to set all the colours */
 	private void setColours() {
 
-		tracklist.setBackground(TRACKLIST_GREEN);
+		tracklist.setBackground(COLOR_TRACKLIST);
 		tracklist.setForeground(Color.BLACK);
-		tracklist.setSelectionBackground(WINDOW_GREEN);
-		tracklist.setFixedCellHeight(18);
+		tracklist.setSelectionBackground(COLOR_WINDOW);
+		tracklist.setFixedCellHeight(22);
 		tracklist.setFont(MAIN_FONT);
 		tracklist.setCellRenderer(new MyCellRenderer());
 
-		playlist.setBackground(PLAYLIST_GREEN);
+		playlist.setBackground(COLOR_PLAYLIST);
 		playlist.setForeground(Color.BLACK);
-		tracklist.setFixedCellHeight(20);
 
-		trackTimeSlider.setBackground(WINDOW_GREEN);
-		trackTimeSlider.setForeground(TRACKLIST_GREEN);
+		trackTimeSlider.setBackground(COLOR_WINDOW);
+		trackTimeSlider.setForeground(COLOR_TRACKLIST);
 
-		titleLabel.setBackground(TRACKLIST_GREEN);
+		titleLabel.setBackground(COLOR_TRACKLIST);
 		titleLabel.setForeground(Color.BLACK);
 		titleLabel.setOpaque(true);
 
-		trackInfoLabel.setBackground(LABEL_GREEN);
+		trackInfoLabel.setBackground(COLOR_LABEL);
 		trackInfoLabel.setForeground(Color.BLACK);
 		trackInfoLabel.setOpaque(true);
+		trackInfoLabel.setFont(MAIN_FONT);
 
-		placeholder.setBackground(WINDOW_GREEN);
+		placeholder.setBackground(COLOR_WINDOW);
 		placeholder.setOpaque(true);
 
-		trackInfoBar.setBackground(WINDOW_GREEN);
+		trackInfoBar.setBackground(COLOR_WINDOW);
 
 	}
 
@@ -579,7 +577,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		Border placeBorder = BorderFactory.createMatteBorder(3, 3, 0, 3,
 				Color.BLACK);
 		Border emptyBorder = BorderFactory.createMatteBorder(0, 3, 0, 0,
-				TRACKLIST_GREEN);
+				COLOR_TRACKLIST);
 
 		playlistGUI.setBorder(listBorder);
 		trackInfoLabel.setBorder(infoLabelBorder);
@@ -671,9 +669,11 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 					line = line.replace("directory=", "");
 					DIRECTORY = line;
 
-					if (System.getProperty("os.name").startsWith("Win")
-							&& !DIRECTORY.endsWith("\\"))
+					if (System.getProperty("os.name").startsWith("Win") && !DIRECTORY.endsWith("\\"))
 						DIRECTORY = DIRECTORY.concat("\\");
+					
+					else if(!DIRECTORY.endsWith("/"))
+						DIRECTORY = DIRECTORY.concat("/");
 				}
 
 				// If a playlist is found; get the name of the list and add it
@@ -724,9 +724,10 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 
 			// If you're using Windows and the directory "seems" incomplete,
 			// finish it.
-			if (System.getProperty("os.name").startsWith("Win")
-					&& !DIRECTORY.endsWith("\\"))
+			if (System.getProperty("os.name").startsWith("Win") && !DIRECTORY.endsWith("\\"))
 				DIRECTORY = DIRECTORY.concat("\\");
+			else if (!DIRECTORY.endsWith("/"))
+				DIRECTORY = DIRECTORY.concat("/");
 
 		}
 	}
@@ -883,13 +884,13 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		
 
 		if (trackName.length() < 24)
-			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+			trackInfoLabel.setFont(new Font("Verdana", Font.BOLD, 14));
 		else if (trackName.length() < 32)
-			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
+			trackInfoLabel.setFont(new Font("Verdana", Font.BOLD, 12));
 		else if (trackName.length() < 40)
-			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 10));
+			trackInfoLabel.setFont(new Font("Verdana", Font.BOLD, 10));
 		else
-			trackInfoLabel.setFont(new Font("Tahoma", Font.BOLD, 8));
+			trackInfoLabel.setFont(new Font("Verdana", Font.BOLD, 8));
 
 		setTitle("Onyx Music Player - " + (String) tracklist.getSelectedValue());
 
@@ -902,8 +903,10 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	private void moveSlider() {
 		int totalFrames = player.getLengthInFrames();
 		int currentFrame = player.getPlayingPosition();
+		trackTimeSlider.setUI(new CustomSlider(trackTimeSlider));
 		trackTimeSlider.setMaximum(totalFrames + 1);
 		trackTimeSlider.setValue(currentFrame);
+		
 	}
 
 	/** Create a playlist */
@@ -1320,11 +1323,11 @@ class MyCellRenderer extends DefaultListCellRenderer {
 	private static final long serialVersionUID = 1L;
 	
 	/* Spotify Colour Scheme */
-//	private final Color LIGHT = new Color(47, 47, 47);
-//	private final Color DARK = new Color(57, 57, 57);
+	private final Color LIGHT = new Color(47, 47, 47);
+	private final Color DARK = new Color(57, 57, 57);
 	
-	private final Color LIGHT = new Color(25, 80, 25);
-	private final Color DARK = new Color(30, 70, 30);
+//	private final Color LIGHT = new Color(25, 80, 25);
+//	private final Color DARK = new Color(30, 70, 30);
 	
 	private final Color BLUE = new Color(175, 220, 255);
 

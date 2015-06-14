@@ -1,31 +1,24 @@
 ﻿  				     TODO
 
+ Timern stängs aldrig av om repeat är false och den har spelat den sista låten
 
-
-                      Timern stängs aldrig av om repeat är false och den har spelat den sista låten
-
-
-
-
-
-
-
-■ Spellistor
+* Spellistor
 
 Done.
 
 
-■ Panelen med alla knappar och slidern
+* Panelen med alla knappar och slidern
 
 Lägg till en typ av slider för att ändra volymen. //No.
 
-■ Uppspelning
+
+* Uppspelning
 
 Vill vi ha att man ska kunna dra i JSlidern för att säga vart i låten man ska spela ifrån?
 Bra funktion, potentiellt svårt att fixa på ett bra sätt. (Imo, nej, blir jobbigt, men om vi får tid över, visst)
 
 
-■ Övrigt
+* Övrigt
 
 - Fakereklam? :D
 
@@ -33,3 +26,4 @@ Bra funktion, potentiellt svårt att fixa på ett bra sätt. (Imo, nej, blir job
 
 
 //TODO Lägg till mer saker! LOL TODOception
+
