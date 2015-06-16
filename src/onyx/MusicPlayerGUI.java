@@ -880,20 +880,23 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	private void setLabelText() {
 
 		String trackName = (String) tracklist.getSelectedValue();
-		trackInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		trackInfoLabel.setText(trackName);
+		
+		String labelText = trackName.replace(" (", "<br>(");
+		trackInfoLabel.setText("<html><div style=\"text-align: center;\">" + labelText + "<html>");
 		
 
 		if (trackName.length() < 24)
 			trackInfoLabel.setFont(new Font("Verdana", Font.BOLD, 14));
-		else if (trackName.length() < 32)
+		else if (trackName.length() < 46)
 			trackInfoLabel.setFont(new Font("Verdana", Font.BOLD, 12));
-		else if (trackName.length() < 40)
-			trackInfoLabel.setFont(new Font("Verdana", Font.BOLD, 10));
 		else
-			trackInfoLabel.setFont(new Font("Verdana", Font.BOLD, 8));
+			trackInfoLabel.setFont(new Font("Verdana", Font.BOLD, 10));
+		
+		trackInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		
 
 		setTitle("Onyx Music Player - " + (String) tracklist.getSelectedValue());
+		
 
 		titleLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
