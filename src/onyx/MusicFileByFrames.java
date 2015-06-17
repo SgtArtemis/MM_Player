@@ -69,6 +69,7 @@ public class MusicFileByFrames {
 			AudioDevice out = audio;
 			audio = null;
 			out.close();
+			out.flush();
 			try {
 				bitstream.close();
 			} catch (BitstreamException ex) {
@@ -174,6 +175,7 @@ public class MusicFileByFrames {
 			count++;
 		}
 		bitstream.close();
+
 		return count;
 	}
 

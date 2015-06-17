@@ -1,5 +1,3 @@
-
-
 /**
  * Projekt - INDA12 - Vårterminen 2013
  * 
@@ -17,6 +15,7 @@ import java.io.*;
 import java.util.*;
 import java.util.Timer;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.border.Border;
 
@@ -63,7 +62,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 
 	private JMenuBar menuBar = new JMenuBar();
 
-	public PopupListener popupListener;
+	public PopupHandler popupListener;
 
 	private MusicPlayer player;
 
@@ -335,6 +334,9 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 			b.setBackground(COLOR_WINDOW);
 			b.setPreferredSize(new Dimension(65, 65));
 			b.setBorder(null);
+			b.setOpaque(false);
+			b.setContentAreaFilled(false);
+			b.setBorderPainted(false);
 		}
 
 		playlistButton.setBackground(COLOR_WINDOW);
@@ -525,7 +527,9 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 				SpringLayout.WEST, this);
 
 		trackTimeSlider.setPreferredSize(new Dimension(width - 60, 20));
-		trackTimeSlider.setUI(new CustomSlider(trackTimeSlider));
+		trackTimeSlider.setUI(new TimeSlider(trackTimeSlider));
+		
+		
 
 	}
 
@@ -537,7 +541,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		tracklist.setSelectionBackground(COLOR_WINDOW);
 		tracklist.setFixedCellHeight(22);
 		tracklist.setFont(MAIN_FONT);
-		tracklist.setCellRenderer(new MyCellRenderer());
+		tracklist.setCellRenderer(new ListCellRenderer());
 
 		playlist.setBackground(COLOR_PLAYLIST);
 		playlist.setForeground(Color.BLACK);
@@ -604,7 +608,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		popup.add(menuList);
 
 		// Add listener to the text area so the popup menu can come up.
-		popupListener = new PopupListener(popup);
+		popupListener = new PopupHandler(popup);
 		tracklist.addMouseListener(popupListener);
 		titleLabel.addMouseListener(popupListener);
 	}
@@ -822,13 +826,15 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	/** Method invoked when music is to be played */
 	private void playTrack() {
 		stopTimer();
-
+		
 		// If the selected track is NOT the same as the current song, it's a new
 		// track.
 		if (!trackName.equals(tracklist.getSelectedValue() + ".mp3"))
 			newTrack = true;
 
 		trackName = tracklist.getSelectedValue() + ".mp3";
+		
+		updateTimeOfSong();
 
 		// If there's a new track OR we've set the track to repeat, play the
 		// desired file.
@@ -854,6 +860,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	private void playSameTrack() {
 		stopTimer();
 		trackName = tracklist.getSelectedValue() + ".mp3";
+		updateTimeOfSong();
 		try {
 			player.play(DIRECTORY + trackName);
 		} catch (JavaLayerException e) {
@@ -867,6 +874,9 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 
 	/** Method which checks if you should play the same track or the next one. */
 	private void checkHowToPlay() {
+		
+		updateTimeOfSong();
+		
 		if (playing && TRACK_INDEX != tracklist.getSelectedIndex()) {
 			pauseOrPlay();
 			playTrack();
@@ -907,10 +917,23 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	private void moveSlider() {
 		int totalFrames = player.getLengthInFrames();
 		int currentFrame = player.getPlayingPosition();
-		trackTimeSlider.setUI(new CustomSlider(trackTimeSlider));
+		trackTimeSlider.setUI(new TimeSlider(trackTimeSlider));
 		trackTimeSlider.setMaximum(totalFrames + 1);
 		trackTimeSlider.setValue(currentFrame);
 		
+	}
+	
+	public void updateTimeOfSong() {
+		try {
+			if(!trackName.equals(""))
+				System.out.println("TIME OF TRACK: " + player.getTrackLength(DIRECTORY + trackName));
+		} catch (UnsupportedAudioFileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} //TODO
 	}
 
 	/** Create a playlist */
@@ -1004,7 +1027,6 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		if (a.getSource() == shuffleButton) {
 			simulateShuffle();
 		}
-		// Repeats the whole tracklist when it's done
 		// Repeats the whole tracklist when it's done
 		if (a.getSource() == repeatButton) {
 
@@ -1299,62 +1321,4 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	public void componentShown(ComponentEvent arg0) {
 	}
 
-}
-
-class PopupListener extends MouseAdapter {
-	public int mouseX = 0;
-	public int mouseY = 0;
-	private JPopupMenu menu;
-
-	public PopupListener(JPopupMenu m) {
-		menu = m;
-	}
-
-	public void mousePressed(MouseEvent e) {
-		showPopup(e);
-	}
-
-	public void mouseReleased(MouseEvent e) {
-		showPopup(e);
-	}
-
-	private void showPopup(MouseEvent e) {
-		if (e.isPopupTrigger()) {
-			menu.show(e.getComponent(), e.getX(), e.getY());
-		}
-	}
-
-}
-
-class MyCellRenderer extends DefaultListCellRenderer {
-
-	private static final long serialVersionUID = 1L;
-	
-	/* Spotify Colour Scheme */
-	private final Color LIGHT = new Color(47, 47, 47);
-	private final Color DARK = new Color(57, 57, 57);
-	
-//	private final Color LIGHT = new Color(25, 80, 25);
-//	private final Color DARK = new Color(30, 70, 30);
-	
-	private final Color BLUE = new Color(175, 220, 255);
-
-	public Component getListCellRendererComponent(JList<?> list, Object value,
-			int index, boolean isSelected, boolean cellHasFocus) {
-		Component c = super.getListCellRendererComponent(list, value, index,
-				isSelected, cellHasFocus);
-
-		// Unless an item is selected, alternate the background between light
-		// and dark grey.
-		if (isSelected)
-			c.setBackground(BLUE);
-
-		else if (index % 2 == 0)
-			c.setBackground(LIGHT);
-
-		else
-			c.setBackground(DARK);
-
-		return c;
-	}
 }

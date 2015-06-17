@@ -28,14 +28,9 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.Mixer.Info;
 
-public class Audio {
+public class VolumeHandler {
 
-	public static void main(String[] args) throws Exception {
-		System.out.println(getHierarchyInfo());
-		System.out.println(getMasterOutputVolume());
-	}
-
-	public static void setMasterOutputVolume(float value) {
+	public void setMasterOutputVolume(float value) {
 		if (value < 0 || value > 1)
 			throw new IllegalArgumentException(
 					"Volume can only be set to a value from 0 to 1. Given value is illegal: " + value);
@@ -52,7 +47,7 @@ public class Audio {
 		}
 	}
 
-	public static Float getMasterOutputVolume() {
+	public Float getMasterOutputVolume() {
 		Line line = getMasterOutputLine();
 		if (line == null) return null;
 		boolean opened = open(line);
@@ -65,7 +60,7 @@ public class Audio {
 		}
 	}
 
-	public static void setMasterOutputMute(boolean value) {
+	public void setMasterOutputMute(boolean value) {
 		Line line = getMasterOutputLine();
 		if (line == null) throw new RuntimeException("Master output port not found");
 		boolean opened = open(line);
@@ -79,7 +74,7 @@ public class Audio {
 		}
 	}
 
-	public static Boolean getMasterOutputMute() {
+	public Boolean getMasterOutputMute() {
 		Line line = getMasterOutputLine();
 		if (line == null) return null;
 		boolean opened = open(line);

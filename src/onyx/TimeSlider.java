@@ -5,10 +5,10 @@ import java.awt.*;
 import javax.swing.JSlider;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-public class CustomSlider extends BasicSliderUI {
+public class TimeSlider extends BasicSliderUI {
 
 
-    public CustomSlider(JSlider slider) {
+    public TimeSlider(JSlider slider) {
         super(slider);
     }
 
