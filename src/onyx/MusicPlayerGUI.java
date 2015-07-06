@@ -11,7 +11,7 @@
  * TODO:
  * 
  * Essential:
- * Volume handling - Custom slider [DONE-ISH]
+ * Volume handling - Custom slider [DONE]
  * Song fast-forwarding and rewinding via TimeSlider
  * 
  * Major:
