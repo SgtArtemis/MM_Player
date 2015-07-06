@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.tritonus.share.sampled.TAudioFormat;
 import org.tritonus.share.sampled.file.TAudioFileFormat;
 
 import javax.sound.sampled.*;
@@ -140,6 +139,7 @@ public class MusicPlayer
 	}
 	
 	public void stop(){
+		System.out.println("ATTEMPTINF TO STOP.");
 		framesPlayer.stop();
 	}
 	

@@ -21,15 +21,15 @@ public class TimeSlider extends BasicSliderUI {
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-        //p = new LinearGradientPaint(start, end, fracs, colors);
-        g2d.setColor(new Color(40, 100, 40));
-        g2d.fillRoundRect(t.x, t.y, t.width, 14, 14, 14);
-        //g2d.fill
+        //Border
+        g2d.setColor(new Color(0, 0, 0));
+        g2d.fillRoundRect(t.x, t.y, t.width+4, 14, 14, 14);
         
-        g2d.setColor(new Color(50, 200, 50));
-        g2d.fillRoundRect(t.x+2, t.y+2, t.width-4, 10, 10, 10);
+        //Bakom thumb
+        g2d.setColor(new Color(55, 55, 50));
+        g2d.fillRoundRect(t.x+2, t.y+2, t.width, 10, 10, 10);
         
-        g2d.setColor(new Color(40, 100, 40));
+        g2d.setColor(new Color(0, 0, 0));
         g2d.fillRoundRect(t.x, t.y, tn.x, 14, 14, 14);
         
     }

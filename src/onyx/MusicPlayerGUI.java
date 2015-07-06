@@ -7,6 +7,30 @@
  * 
  */
 
+/**
+ * TODO:
+ * 
+ * Essential:
+ * Volume handling - Custom slider [DONE-ISH]
+ * Song fast-forwarding and rewinding via TimeSlider
+ * 
+ * Major:
+ * Icon resizing - fuck using Paint.NET on Ubuntu 14.04 [DONE]
+ * Implement search - take note when queueing for a search query
+ * Separate song class?
+ * Song timing - display next to timeTrackSlider - JLabels is probably the easiest option
+ * 
+ * Minor:
+ * "New Playlist" icon [DONE]
+ * Combine MusicPlayer and MusicFileByFrames? Change Frames class to Track?
+ * 
+ * Wouldn't it be nice:
+ * Properly commented code
+ * Multiple directories - Probably requires song class, where each song has a "path"
+ * 
+ * 
+ */
+
 package onyx;
 
 import java.awt.*;
@@ -18,11 +42,13 @@ import java.util.Timer;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import javazoom.jl.decoder.JavaLayerException;
 
 public class MusicPlayerGUI extends JFrame implements ActionListener,
-MouseListener, WindowListener, KeyListener, ComponentListener {
+MouseListener, WindowListener, KeyListener, ComponentListener, ChangeListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -65,6 +91,8 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	public PopupHandler popupListener;
 
 	private MusicPlayer player;
+	
+	private VolumeHandler volume = new VolumeHandler();
 
 	private JPanel trackInfoBar = new JPanel();
 
@@ -111,6 +139,8 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 
 	// Slider to show position in song
 	private JSlider trackTimeSlider;
+	
+	private JSlider volumeSlider;
 
 	// Assorted booleans
 	private boolean playing;
@@ -120,7 +150,10 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	private boolean repeatOne;
 
 	private String trackName = "";
+	
 	private int TRACK_INDEX;
+	
+	private float currentVolume;
 
 	// Variable used to keep track of the songs that have been played.
 	private ArrayList<Integer> previousTrackIndex = new ArrayList<Integer>();
@@ -137,8 +170,8 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 
 		setLayout(new GridBagLayout());
 
-		setMinimumSize(new Dimension(800, 580));
-		setSize(new Dimension(1100, 660));
+		setMinimumSize(new Dimension(800, 500));
+		setSize(new Dimension(900, 500));
 
 		setLocationRelativeTo(null); // Center window
 
@@ -206,7 +239,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		trackInfoLabel = new JLabel();
 		placeholder = new JLabel();
 
-		titleLabel.setText("Main Playlist");
+		titleLabel.setText("Library");
 		titleLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -226,6 +259,11 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		trackTimeSlider.setPreferredSize(new Dimension(getBounds().width - 50, 20));
 		trackTimeSlider.setEnabled(false);
 		trackTimeSlider.addMouseListener(this);
+		
+		volumeSlider = new JSlider();
+		volumeSlider.setPreferredSize(new Dimension(120, 20));
+		volumeSlider.setUI(new VolumeSlider(volumeSlider));
+		volumeSlider.setOpaque(false);
 
 		playpauseButton.addActionListener(this);
 		nextButton.addActionListener(this);
@@ -312,7 +350,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		repeatTrueIcon = new ImageIcon(getClass().getClassLoader().getResource("repeat_all.png"));
 		repeatOneIcon = new ImageIcon(getClass().getClassLoader().getResource("repeat_one.png"));
 		repeatFalseIcon = new ImageIcon(getClass().getClassLoader().getResource("repeat_false.png"));
-		playlistIcon = new ImageIcon(getClass().getClassLoader().getResource("new_playlist.png"));
+		playlistIcon = new ImageIcon(getClass().getClassLoader().getResource("newplaylist.png"));
 
 
 		// Set the icons on the buttons
@@ -328,23 +366,20 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		listOfButtons.add(previousButton);
 		listOfButtons.add(shuffleButton);
 		listOfButtons.add(repeatButton);
+		listOfButtons.add(playlistButton);
 
-		// Make each button a certain size and colour.
+		// Make each button a certain size and colour, and remove bordrs and focus
 		for (JButton b : listOfButtons) {
 			b.setBackground(COLOR_WINDOW);
-			b.setPreferredSize(new Dimension(65, 65));
+			b.setPreferredSize(new Dimension(45, 45));
 			b.setBorder(null);
 			b.setOpaque(false);
 			b.setContentAreaFilled(false);
 			b.setBorderPainted(false);
+			b.setFocusPainted(false);
 		}
 
-		playlistButton.setBackground(COLOR_WINDOW);
-		playlistButton.setPreferredSize(new Dimension(208, 48));
-		playlistButton.setBorder(null);
-
-		// repeatButton And shuffleButton are supposed to be smaller, so
-		// yeah....
+		// repeatButton And shuffleButton are supposed to be smaller
 		repeatButton.setPreferredSize(new Dimension(35, 35));
 		shuffleButton.setPreferredSize(new Dimension(35, 35));
 
@@ -410,7 +445,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 
 		c.fill = GridBagConstraints.BOTH;
 		c.ipady = 400;
-		c.ipadx = 200;
+		c.ipadx = 160;
 		c.gridheight = 3;
 		c.weightx = 0.0;
 		c.weighty = 10.0;
@@ -461,7 +496,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		c.gridy = 3;
 		add(trackInfoLabel, c);
 
-		c.ipady = 110;
+		c.ipady = 50;
 		c.ipadx = 20;
 		c.weightx = 0.0;
 		c.weighty = 1.0;
@@ -485,48 +520,56 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		trackInfoBar.add(previousButton);
 		trackInfoBar.add(playpauseButton);
 		trackInfoBar.add(nextButton);
+		trackInfoBar.add(volumeSlider);
 		trackInfoBar.add(playlistButton);
 		trackInfoBar.add(trackTimeSlider);
+		
 
 		int width = this.getWidth();
 
 		// Define "springs" between the different components.
-		sl.putConstraint(SpringLayout.WEST, repeatButton, 55,
+		sl.putConstraint(SpringLayout.WEST, previousButton, 20,
 				SpringLayout.WEST, this);
-		sl.putConstraint(SpringLayout.NORTH, repeatButton, 25,
+		sl.putConstraint(SpringLayout.NORTH, previousButton, 0,
 				SpringLayout.NORTH, this);
 
-		sl.putConstraint(SpringLayout.WEST, shuffleButton, 10,
-				SpringLayout.EAST, repeatButton);
-		sl.putConstraint(SpringLayout.NORTH, shuffleButton, 25,
-				SpringLayout.NORTH, this);
-
-		sl.putConstraint(SpringLayout.NORTH, previousButton, 5,
-				SpringLayout.NORTH, this);
-		sl.putConstraint(SpringLayout.WEST, previousButton, (width / 2) - 150,
-				SpringLayout.WEST, this);
-
-		sl.putConstraint(SpringLayout.NORTH, playpauseButton, 5,
-				SpringLayout.NORTH, this);
-		sl.putConstraint(SpringLayout.WEST, playpauseButton, 20,
+		sl.putConstraint(SpringLayout.WEST, playpauseButton, 2,
 				SpringLayout.EAST, previousButton);
-
-		sl.putConstraint(SpringLayout.NORTH, nextButton, 5, SpringLayout.NORTH,
-				this);
-		sl.putConstraint(SpringLayout.WEST, nextButton, 20, SpringLayout.EAST,
-				playpauseButton);
-
-		sl.putConstraint(SpringLayout.NORTH, playlistButton, 15,
+		sl.putConstraint(SpringLayout.NORTH, playpauseButton, 0,
 				SpringLayout.NORTH, this);
-		sl.putConstraint(SpringLayout.WEST, playlistButton, width - 250,
-				SpringLayout.WEST, this);
 
-		sl.putConstraint(SpringLayout.NORTH, trackTimeSlider, 80,
+		sl.putConstraint(SpringLayout.NORTH, nextButton, 0,
 				SpringLayout.NORTH, this);
-		sl.putConstraint(SpringLayout.WEST, trackTimeSlider, 20,
-				SpringLayout.WEST, this);
+		sl.putConstraint(SpringLayout.WEST, nextButton, 2,
+				SpringLayout.EAST, playpauseButton);
+		
+		sl.putConstraint(SpringLayout.NORTH, trackTimeSlider, 15,
+				SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, trackTimeSlider, 25,
+				SpringLayout.EAST, nextButton);
 
-		trackTimeSlider.setPreferredSize(new Dimension(width - 60, 20));
+		sl.putConstraint(SpringLayout.NORTH, repeatButton, 5,
+				SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, repeatButton, 5,
+				SpringLayout.EAST, trackTimeSlider);
+
+		sl.putConstraint(SpringLayout.NORTH, shuffleButton, 5,
+				SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, shuffleButton, 5,
+				SpringLayout.EAST, repeatButton);
+		
+		sl.putConstraint(SpringLayout.NORTH, playlistButton, 0,
+				SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, playlistButton, 2,
+				SpringLayout.EAST, shuffleButton);
+		
+		sl.putConstraint(SpringLayout.NORTH, volumeSlider, 15,
+				SpringLayout.NORTH, this);
+		sl.putConstraint(SpringLayout.WEST, volumeSlider, 5,
+				SpringLayout.EAST, playlistButton);
+		
+
+		trackTimeSlider.setPreferredSize(new Dimension(width - 450, 20));
 		trackTimeSlider.setUI(new TimeSlider(trackTimeSlider));
 		
 		
@@ -548,6 +591,15 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 
 		trackTimeSlider.setBackground(COLOR_WINDOW);
 		trackTimeSlider.setForeground(COLOR_TRACKLIST);
+		
+		volumeSlider.setMaximum(95);
+		volumeSlider.setMinimum(5);
+		volumeSlider.setSnapToTicks(true); //TODO
+		volumeSlider.setMajorTickSpacing(5);
+		volumeSlider.setValue((int) (volume.getMasterOutputVolume() * 100));
+		volumeSlider.addChangeListener(this); //We add the changeListener after the value has been set,as to not change to master volume
+		volumeSlider.setFocusable(false);
+		
 
 		titleLabel.setBackground(COLOR_TRACKLIST);
 		titleLabel.setForeground(Color.BLACK);
@@ -979,6 +1031,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		if (a.getSource() == playlistButton) {
 			createPlaylist();
 		}
+		
 		// TODO
 		if (a.getSource() == menuPlay) {
 			setPreviousTrackIndex();
@@ -1081,7 +1134,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 		}
 
 		if (a.getSource() == backMenuItem) {
-			titleLabel.setText("Main Playlist");
+			titleLabel.setText("Library");
 			th.listTracks();
 			tracklist.setListData(th.getTracks());
 		}
@@ -1105,10 +1158,6 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 				tracklist.setSelectedValue(trackName, false);
 			}
 		}
-
-		// This removes the "border" around the buttons
-		for (JButton b : listOfButtons)
-			b.setFocusPainted(false);
 
 	}
 
@@ -1216,7 +1265,7 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 				String[] tracks = th.getTracks();
 				int trackPos = Arrays.asList(tracks).indexOf(
 						tracklist.getSelectedValue());
-				bar.setValue((trackPos * 19));
+				bar.setValue((trackPos * 20));
 			}
 		}
 	}
@@ -1247,8 +1296,11 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	}
 
 	/**
-	 * Method which handles key presses, which is only the deletion of
-	 * playlists.
+	 * Method which handles key presses.
+	 * This concerns:
+	 * DELETE - Delete playlists
+	 * SPACEBAR - Play or pause
+	 * CTRL + ARROWKEY - Next or previous
 	 */
 	@Override
 	public void keyReleased(KeyEvent ke) {
@@ -1265,6 +1317,11 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 				}
 			}
 
+		}
+		
+		if (ke.getKeyCode() == KeyEvent.VK_SPACE) {
+			pauseOrPlay();
+			System.out.println("Space was released");
 		}
 	}
 
@@ -1319,6 +1376,16 @@ MouseListener, WindowListener, KeyListener, ComponentListener {
 	}
 
 	public void componentShown(ComponentEvent arg0) {
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent arg0) {
+		if((arg0.getSource() == volumeSlider) && volumeSlider.getValue() != currentVolume) {
+			System.out.println("VOLUME: "  + volumeSlider.getValue());
+			volume.setMasterOutputVolume((float)volumeSlider.getValue() / 100);
+			currentVolume = volumeSlider.getValue();
+		}
+		
 	}
 
 }

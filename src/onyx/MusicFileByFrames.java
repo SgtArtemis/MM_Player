@@ -69,14 +69,15 @@ public class MusicFileByFrames {
 			AudioDevice out = audio;
 			audio = null;
 			out.close();
-			out.flush();
 			try {
 				bitstream.close();
 			} catch (BitstreamException ex) {
+				System.out.println("BITSTREAM ERROR??");
 			}
 			bitstream = null;
 			decoder = null;
 		}
+		System.out.println("close was success");
 	}
 
 	public void pause() throws JavaLayerException {
